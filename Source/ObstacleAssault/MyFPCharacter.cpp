@@ -176,59 +176,7 @@ bool AMyFPCharacter::CanUnCrouch()
 	TraceParams.AddIgnoredActor(this);
 
 	//If nothing is hit then we can uncrouch!
-
 	return !GetWorld()->SweepSingleByChannel(HitResult, startLoc, endLoc, FQuat::Identity, ECC_Camera , CapsuleComponent->GetCollisionShape(), TraceParams);
-
-	//FCollisionShape collisionShape = CapsuleComponent->GetCollisionShape();
-
-	//Debug Lines using SweepByChannel
-	//if (!hit)
-	//{
-	//	// Draw a red sphere at the hit location
-	//	DrawDebugCapsule (
-	//		GetWorld(),
-	//		HitResult.ImpactPoint,
-	//		collisionShape.GetCapsuleHalfHeight(), // Sphere radius
-	//		collisionShape.GetCapsuleRadius(), // Number of segments
-	//		FQuat::Identity,
-	//		FColor::Red,
-	//		false, // Persistent (remains until cleared)
-	//		10.0f, // Life time (0.0f for indefinite)
-	//		0U,
-	//		3.0f
-	//	);
-	//}
-	//else
-	//{
-	//	// Draw a green line indicating the sweep
-	//	DrawDebugLine(
-	//		GetWorld(),
-	//		startLoc,
-	//		endLoc,
-	//		FColor::Green,
-	//		false, // Persistent (remains until cleared)
-	//		10.0f, // Life time (0.0f for indefinite)
-	//		0U,
-	//		3.0f
-	//	);
-	//}
-
-	/*TArray<AActor*> ActorsToIgnore;
-	ActorsToIgnore.Add(this);*/
-
-	//This is the same thing but using the UKismetSystemLibrary
-	//return !UKismetSystemLibrary::SphereTraceSingle(
-	//	GetWorld(),
-	//	startLoc,
-	//	endLoc,
-	//	UncrouchTraceRadius,
-	//	UEngineTypes::ConvertToTraceType(ECC_Camera),
-	//	false, 
-	//	ActorsToIgnore,
-	//	EDrawDebugTrace::ForDuration,
-	//	HitResult,
-	//	true
-	//);
 }
 
 
