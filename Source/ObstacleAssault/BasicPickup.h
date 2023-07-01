@@ -17,7 +17,8 @@ public:
 	ABasicPickup();
 
 	virtual void Interact() override;
-	virtual FString GetName() override;
+	inline virtual FString GetName() override { return Name; };
+	inline virtual AActor* GetOwningActor() override { return this; }; //This is kinda cool
 
 protected:
 	UPROPERTY(EditAnywhere)

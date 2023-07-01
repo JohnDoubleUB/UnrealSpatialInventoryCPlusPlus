@@ -5,8 +5,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/AudioComponent.h"
-#include "DrawDebugHelpers.h"
 #include "MyFPCharacter.h"
+#include "CustomTraceChannelNames.h"
 
 
 // Sets default values
@@ -16,12 +16,20 @@ AMyFPCharacter::AMyFPCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 	bUseControllerRotationYaw = false;
+	
 	CharacterMovement = GetCharacterMovement();
+	
 	CapsuleComponent = GetCapsuleComponent();
+	
 	UncrouchTraceRadius = CapsuleComponent->GetCollisionShape().GetCapsuleRadius();
+	
 	cam = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	cam->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	cam->SetRelativeLocation(FVector(0, 0, 40));
+
+	InteractorComponent = CreateDefaultSubobject<UInteractorComponent>(TEXT("Interactor"));
+	InteractorComponent->Actor = this;
+	InteractorComponent->ActorViewComponent = cam;
 }
 
 // Called when the game starts or when spawned
@@ -42,7 +50,6 @@ void AMyFPCharacter::Tick(float DeltaTime)
 	FVector cameraHeight = CameraBob(DeltaTime, isFalling);
 	HandleFootstep(cameraHeight, isFalling);
 	HandleCrouch(DeltaTime);
-	HandleItemHit();
 }
 
 FVector AMyFPCharacter::CameraBob(const float& DeltaTime, const bool& falling)
@@ -216,29 +223,6 @@ void AMyFPCharacter::HandleCrouch(const float& DeltaTime)
 		FVector currentCapsuleLocation = CapsuleComponent->GetRelativeLocation();
 		CapsuleComponent->SetRelativeLocation(FVector(currentCapsuleLocation.X, currentCapsuleLocation.Y, (currentCapsuleLocation.Z + DeltaMovCaps)), true);
 	}
-}
-
-void AMyFPCharacter::HandleItemHit()
-{
-	return;
-	const FVector startLoc = GetActorLocation() + cam->GetRelativeLocation();
-	const FVector endLoc = (cam->GetForwardVector() * InteractDistance) + startLoc;
-	TArray<TEnumAsByte<EObjectTypeQuery>> traceObjectTypes;
-	FHitResult hit;
-	FCollisionQueryParams TraceParams;
-
-	bool bHit = GetWorld()->LineTraceSingleByChannel(hit, startLoc, endLoc, ECC_Visibility, TraceParams);
-
-	DrawDebugLine(GetWorld(), startLoc, endLoc, FColor::Orange, false, 0.1f);
-
-	if (bHit) 
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Orange, FString::Printf(TEXT("Trace Hit %s"), *hit.GetActor()->GetName()));
-	}
-	//UWorld::LineTrace
-	//UKismetSystemLibrary::LineTraceSingleByProfile;
-	//	UKismetSystemLibrary::LineTraceSingleForObjects
-	//UKismetSystemLibrary::LineTraceSingle(GetWorld(), startLoc, endLoc, )
 }
 
 void AMyFPCharacter::HorizontalMovement(float value)

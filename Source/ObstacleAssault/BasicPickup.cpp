@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+#include "GameFramework/Actor.h"
 #include "BasicPickup.h"
 
 // Sets default values
@@ -14,11 +14,6 @@ ABasicPickup::ABasicPickup()
 void ABasicPickup::Interact()
 {
 	Destroy();
-}
-
-FString ABasicPickup::GetName()
-{
-	return Name;
 }
 
 // Called when the game starts or when spawned

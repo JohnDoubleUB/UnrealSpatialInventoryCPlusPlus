@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Sound/SoundCue.h"
 #include "GameFramework/Character.h"
+#include "InteractorComponent.h"
 #include "Components/InputComponent.h"
 #include "Camera/CameraComponent.h"
 #include "MyFPCharacter.generated.h"
@@ -52,9 +53,6 @@ public:
 	float SwayAmount = 1.5f;
 
 	UPROPERTY(EditAnywhere)
-	float InteractDistance = 10.0f;
-
-	UPROPERTY(EditAnywhere)
 	USoundCue* FootstepSound;
 
 private: 
@@ -76,7 +74,6 @@ private:
 
 	void HandleFootstep(const FVector& currentPosition, const bool& isFalling);
 	void HandleCrouch(const float& DeltaTime);
-	void HandleItemHit();
 	
 	void PlayFootstep();
 	void PlayFootLand();
@@ -85,6 +82,9 @@ private:
 	UCameraComponent* cam;
 	UCharacterMovementComponent* CharacterMovement;
 	UCapsuleComponent* CapsuleComponent;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Components")
+	UInteractorComponent* InteractorComponent;
 
 	UPROPERTY(VisibleAnywhere, Category = "Debug")
 	FVector CurrentVelocity;
