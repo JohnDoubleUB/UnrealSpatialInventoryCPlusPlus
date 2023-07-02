@@ -1,6 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "GameFramework/CharacterMovementComponent.h"
+#include "PlayerHUD.h"
+#include "Blueprint/UserWidget.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -30,15 +32,41 @@ AMyFPCharacter::AMyFPCharacter()
 	InteractorComponent = CreateDefaultSubobject<UInteractorComponent>(TEXT("Interactor"));
 	InteractorComponent->Actor = this;
 	InteractorComponent->ActorViewComponent = cam;
+	
+	//Bind to interactor event
+	InteractorComponent->OnInteractionChangeDelegate.BindUObject(this, &AMyFPCharacter::OnInteractionChange);
+
+	PlayerHUDClass = nullptr;
+	PlayerHUD = nullptr;
 }
 
 // Called when the game starts or when spawned
 void AMyFPCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
 	DefaultCameraZPos = cam->GetRelativeLocation().Z;
 	DefaultCameraRoll = cam->GetRelativeRotation().Roll;
 	SetCrouch(false);
+
+	if (IsLocallyControlled() && PlayerHUDClass) 
+	{
+
+		PlayerHUD = CreateWidget<UPlayerHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0), PlayerHUDClass);
+		PlayerHUD->AddToPlayerScreen();
+	}
+}
+
+void AMyFPCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (PlayerHUD) 
+	{
+		PlayerHUD->RemoveFromParent();
+		//We can't destroy the widget directly, let the GC take care of it.
+		PlayerHUD = nullptr;
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 // Called every frame
@@ -123,6 +151,15 @@ void AMyFPCharacter::PlayFootLand()
 	if (FootstepSound != nullptr)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, FootstepSound, GetActorLocation());
+	}
+}
+
+void AMyFPCharacter::OnInteractionChange(bool interaction, FString* name)
+{
+	if (PlayerHUD) 
+	{
+		PlayerHUD->SetItemName(name != nullptr ? *name : FString()); //We don't want to accidentally dereference a nullptr, things will die
+		PlayerHUD->OnInteractAvailable(interaction);
 	}
 }
 

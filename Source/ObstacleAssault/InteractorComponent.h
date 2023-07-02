@@ -34,6 +34,13 @@ public:
 
 	IInteractableInterface* GetCurrentInteractable();
 
+	// Delegate signature
+	DECLARE_DELEGATE_TwoParams(FOnInteractionChangeSignature, bool /* interaction */, FString* /* name */)
+	FOnInteractionChangeSignature OnInteractionChangeDelegate;
+	// Function signature
+	//void OnInteractionChange(bool interaction);
+
+
 private:
 	void HandleItemHit();
 	bool CheckIfValid();

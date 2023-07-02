@@ -23,6 +23,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -55,6 +57,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	USoundCue* FootstepSound;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UPlayerHUD> PlayerHUDClass;
+
+	UPROPERTY()
+	class UPlayerHUD* PlayerHUD;
+
 private: 
 	void HorizontalMovement(float value);
 	void VerticalMovement(float value);
@@ -77,6 +85,8 @@ private:
 	
 	void PlayFootstep();
 	void PlayFootLand();
+
+	void OnInteractionChange(bool interaction, FString* name = nullptr);
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
 	UCameraComponent* cam;

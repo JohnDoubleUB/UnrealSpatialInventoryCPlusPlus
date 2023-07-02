@@ -49,7 +49,7 @@ void UInteractorComponent::HandleItemHit()
 
 	bool bHit = GetWorld()->LineTraceSingleByChannel(hit, startLoc, endLoc, ECC_PickupableItem, TraceParams);
 
-	DrawDebugLine(GetWorld(), startLoc, endLoc, FColor::Orange, false, 0.1f);
+	//DrawDebugLine(GetWorld(), startLoc, endLoc, FColor::Orange, false, 0.1f);
 
 	IInteractableInterface* newInteractable = nullptr; //I mean it was anyways but now its obvious
 
@@ -57,9 +57,10 @@ void UInteractorComponent::HandleItemHit()
 	{
 		CurrentInteractable = newInteractable;
 	}
-	else 
+	else if(CurrentInteractable != nullptr)
 	{
 		CurrentInteractable = nullptr;
+		OnInteractionChangeDelegate.ExecuteIfBound(false, nullptr);
 	}
 }
 
@@ -83,7 +84,7 @@ bool UInteractorComponent::TryGetInteractableFromHit(FHitResult& hitResult, IInt
 		return false; 
 	}
 
-	//Ensures that we only cast if this is a new interactable and not the same item we are looking at
+	//Ensures that we only cast if this is a new interactable and not the same item we were already looking at
 	if (CurrentInteractable != nullptr && CurrentInteractable->GetOwningActor() == hitActor) 
 	{
 		interactable = CurrentInteractable;
@@ -99,6 +100,8 @@ bool UInteractorComponent::TryGetInteractableFromHit(FHitResult& hitResult, IInt
 	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Orange, FString::Printf(TEXT("New item found, casting!")));
 	//Assign the pointer back to the interactable argument passed in
 	interactable = Cast<IInteractableInterface>(hitActor);
+
+	OnInteractionChangeDelegate.ExecuteIfBound(true, interactable->GetName());
 
 	return true;
 }

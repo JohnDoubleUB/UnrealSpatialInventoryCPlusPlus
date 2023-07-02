@@ -25,7 +25,7 @@ public:
 	virtual void Interact() = 0;
 	virtual AActor* GetOwningActor() = 0;
 
-	virtual FString GetName();
+	virtual FString* GetName();
 
 	EInteractionType GetInteractionType();
 	
