@@ -33,13 +33,13 @@ public:
 	float InteractDistance = 150.0f;
 
 	IInteractableInterface* GetCurrentInteractable();
+	bool TryGetCurrentInteractable(IInteractableInterface*& interactable);
 
 	// Delegate signature
 	DECLARE_DELEGATE_TwoParams(FOnInteractionChangeSignature, bool /* interaction */, FString* /* name */)
 	FOnInteractionChangeSignature OnInteractionChangeDelegate;
 	// Function signature
 	//void OnInteractionChange(bool interaction);
-
 
 private:
 	void HandleItemHit();

@@ -24,11 +24,12 @@ class OBSTACLEASSAULT_API IInteractableInterface
 public:
 	virtual void Interact() = 0;
 	virtual AActor* GetOwningActor() = 0;
+	virtual bool IsValid() = 0; //If the pickup is currently valid
 
 	virtual FString* GetName();
 
 	EInteractionType GetInteractionType();
-	
+
 protected:
 	EInteractionType InteractionType;
 	
@@ -39,5 +40,7 @@ UENUM(BlueprintType)
 enum class EInteractionType : uint8
 {
 	Pickup UMETA(DisplayName = "Pickup"),
-	Button UMETA(DisplayName = "Button")
+	Button UMETA(DisplayName = "Button"),
+	Physics UMETA(DisplayName = "Physics"),
+	PhysicsRigid UMETA(DisplayName = "PhysicsRigid")
 };

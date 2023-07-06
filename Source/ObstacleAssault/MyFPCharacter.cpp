@@ -16,7 +16,6 @@ AMyFPCharacter::AMyFPCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	AutoPossessPlayer = EAutoReceiveInput::Player0;
 	bUseControllerRotationYaw = false;
 	
 	CharacterMovement = GetCharacterMovement();
@@ -163,37 +162,7 @@ void AMyFPCharacter::OnInteractionChange(bool interaction, FString* name)
 	}
 }
 
-// Called to bind functionality to input
-void AMyFPCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	InputComponent->BindAxis("MoveRight", this, &AMyFPCharacter::HorizontalMovement);
-	InputComponent->BindAxis("MoveForward", this, &AMyFPCharacter::VerticalMovement);
-	InputComponent->BindAxis("TurnRight", this, &AMyFPCharacter::HorizontalRotation);
-	InputComponent->BindAxis("LookUp", this, &AMyFPCharacter::VerticalRotation);
-	InputComponent->BindAction("Crouch",IE_Pressed, this, &AMyFPCharacter::PerformCrouch);
-	InputComponent->BindAction("Jump", IE_Pressed, this, &AMyFPCharacter::PerformJump);
-
-	FInputActionBinding SprintPressedAB("Sprint", IE_Pressed);
-	SprintPressedAB.ActionDelegate.GetDelegateForManualSet().BindLambda([this]()
-		{
-			PerformSprint(true);
-		}
-	);
-
-	FInputActionBinding SprintReleasedAB("Sprint", IE_Released);
-	SprintReleasedAB.ActionDelegate.GetDelegateForManualSet().BindLambda([this]()
-		{
-			PerformSprint(false);
-		}
-	);
-
-	InputComponent->AddActionBinding(SprintPressedAB);
-	InputComponent->AddActionBinding(SprintReleasedAB);
-}
-
-void AMyFPCharacter::PerformCrouch() 
+void AMyFPCharacter::Crouch() 
 {
 	SetCrouch(!bIsCrouching);
 }
@@ -224,13 +193,26 @@ bool AMyFPCharacter::CanUnCrouch()
 }
 
 
-void AMyFPCharacter::PerformJump()
+void AMyFPCharacter::Jump()
 {
 	if (bIsCrouching && SetCrouch(false) == false) return;
-	Jump();
+	Super::Jump();
 }
 
-void AMyFPCharacter::PerformSprint(const bool& sprint)
+void AMyFPCharacter::Interact(const bool& pressed)
+{
+	if (pressed) 
+	{
+		IInteractableInterface* currentInteractable;
+
+		if (InteractorComponent->TryGetCurrentInteractable(currentInteractable)) //Try and get interactable if one is present
+		{
+			currentInteractable->Interact();
+		}
+	}
+}
+
+void AMyFPCharacter::Sprint(const bool& sprint)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Perform sprint: %s"), (sprint ? "True" : "False"));
 

@@ -1,3 +1,4 @@
 #pragma once
 
 #define ECC_PickupableItem ECC_GameTraceChannel1
+#define ECC_NonPickupableItem ECC_WorldDynamic

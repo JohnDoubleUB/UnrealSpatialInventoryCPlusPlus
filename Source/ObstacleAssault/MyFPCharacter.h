@@ -29,9 +29,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	UPROPERTY(EditAnywhere)
 	float WalkingSpeed = 0.5;
 	UPROPERTY(EditAnywhere)
@@ -63,19 +60,23 @@ public:
 	UPROPERTY()
 	class UPlayerHUD* PlayerHUD;
 
-private: 
+	//Inputs
 	void HorizontalMovement(float value);
 	void VerticalMovement(float value);
 
 	void HorizontalRotation(float value);
 	void VerticalRotation(float value);
 
-	void PerformCrouch();
-	void PerformJump();
+	void Crouch();
+	void Jump();
+	void Interact(const bool& pressed);
 
-	void PerformSprint(const bool& sprint);
+	void Sprint(const bool& sprint);
 
 	bool SetCrouch(const bool& crouch);
+
+private: 
+
 	bool CanUnCrouch();
 
 	FVector CameraBob(const float& DeltaTime, const bool& falling);

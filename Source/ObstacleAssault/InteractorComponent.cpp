@@ -37,6 +37,13 @@ IInteractableInterface* UInteractorComponent::GetCurrentInteractable()
 	return CurrentInteractable;
 }
 
+bool UInteractorComponent::TryGetCurrentInteractable(IInteractableInterface*& interactable)
+{
+	if (CurrentInteractable == nullptr) return false;
+	interactable = CurrentInteractable;
+	return true;
+}
+
 void UInteractorComponent::HandleItemHit()
 {
 	if (CheckIfValid() == false) return;
@@ -46,15 +53,22 @@ void UInteractorComponent::HandleItemHit()
 	
 	FHitResult hit;
 	FCollisionQueryParams TraceParams;
+	FCollisionObjectQueryParams ObjectQueryParams;
 
-	bool bHit = GetWorld()->LineTraceSingleByChannel(hit, startLoc, endLoc, ECC_PickupableItem, TraceParams);
+	ObjectQueryParams.AddObjectTypesToQuery(ECC_PickupableItem);
+
+
+	//bool bHit = GetWorld()->LineTraceSingleByChannel(hit, startLoc, endLoc, ECC_PickupableItem, TraceParams);
+	bool bHit = GetWorld()->LineTraceSingleByObjectType(hit, startLoc, endLoc, ObjectQueryParams);
 
 	//DrawDebugLine(GetWorld(), startLoc, endLoc, FColor::Orange, false, 0.1f);
 
 	IInteractableInterface* newInteractable = nullptr; //I mean it was anyways but now its obvious
 
-	if (bHit && TryGetInteractableFromHit(hit, newInteractable))
+	if (bHit && TryGetInteractableFromHit(hit, newInteractable) && newInteractable->IsValid())
 	{
+		//Only store this if it says it is valid
+		//newInteractable->IsValid() ? newInteractable :
 		CurrentInteractable = newInteractable;
 	}
 	else if(CurrentInteractable != nullptr)
