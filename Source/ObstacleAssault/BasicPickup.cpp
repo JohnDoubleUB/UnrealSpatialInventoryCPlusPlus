@@ -35,6 +35,6 @@ void ABasicPickup::Tick(float DeltaTime)
 void ABasicPickup::SetCanBeInteracted(const bool& canBeInteracted)
 {
 	isValid = canBeInteracted;
-	StaticMeshComponent->SetCollisionObjectType(canBeInteracted ? ECC_PickupableItem : ECC_NonPickupableItem);
+	StaticMeshComponent->SetCollisionObjectType(canBeInteracted ? ECC_PickupableItem : ECC_NoCollision);
 }
 
