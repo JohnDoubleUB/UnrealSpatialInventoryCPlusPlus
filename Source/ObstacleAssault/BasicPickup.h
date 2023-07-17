@@ -18,7 +18,7 @@ public:
 	// Sets default values for this actor's properties
 	ABasicPickup();
 
-	virtual void Interact() override;
+	virtual void Interact(USceneComponent* interactingComponent) override;
 	inline virtual FString* GetName() override { return &Name; };
 	inline virtual AActor* GetOwningActor() override { return this; }; //This is kinda cool
 	inline virtual bool IsValid() override { return isValid; }
@@ -26,6 +26,10 @@ public:
 protected:
 	UPROPERTY(EditAnywhere)
 	FString Name;
+
+	UPROPERTY(EditAnywhere)
+	float InterpolationDuration = 0.5f; // Duration in seconds
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -39,6 +43,8 @@ public:
 
 private:
 	bool isValid = true;
+	USceneComponent* TargetComponent;
+	float InterpolationElapsed = 0.0f;
 
 	void SetCanBeInteracted(const bool& canBeInteracted);
 

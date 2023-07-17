@@ -207,7 +207,7 @@ void AMyFPCharacter::Interact(const bool& pressed)
 
 		if (InteractorComponent->TryGetCurrentInteractable(currentInteractable)) //Try and get interactable if one is present
 		{
-			currentInteractable->Interact();
+			currentInteractable->Interact(cam);
 		}
 	}
 }
