@@ -19,9 +19,10 @@ UInventoryComponent::UInventoryComponent()
 void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	InventoryGrid.SetNumUninitialized(Rows * Columns); //Initialize the Inventory grid
 
 	// ...
-	
+
 }
 
 
@@ -35,11 +36,87 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 bool UInventoryComponent::TryAddItem(UPickupObject* pickupObject)
 {
-	if (pickupObject == nullptr) return false;
-	FIntPoint* Dimensions = pickupObject->GetDimensions();
-	//Check if item would fit length ways at this index
+	if (pickupObject == nullptr) return false; //Check its a valid item
 
+	FIntPoint* Dimensions = pickupObject->GetDimensions();
+
+	//Check if item would fit length ways at this index
+	if (Dimensions->X < 1 || Dimensions->Y < 1) return false; //If the dimensions are 0 then they are invalid
+	if (Dimensions->X * Dimensions->Y > InventoryGrid.Num()) return false; //If item could not possibly fit in inventory
+
+	TArray<int>* fullyValidatedIndexes = nullptr;
+
+	//Iterate over each grid tile
+	for (int i = 0; i < InventoryGrid.Num(); ++i)
+	{
+
+		if (IsRoomAvailable(i, Dimensions, fullyValidatedIndexes) && fullyValidatedIndexes != nullptr) //Check if this position is available
+		{
+			//Add item, this is a valid position!
+			for (int x = 0; x < fullyValidatedIndexes->Num(); x++)
+			{
+				InventoryGrid[x] = pickupObject;
+			}
+
+			return true;
+		}
+	}
 
 	return false;
 }
+
+bool UInventoryComponent::IsRoomAvailable(int TopLeftIndex, FIntPoint* ItemDimensions, TArray<int>*& validatedIndexes)
+{
+	//validatedIndexes->Empty(); //Clear array incase it has anything in it
+	return TryValidateGridAvailablility(TopLeftIndex, ItemDimensions, validatedIndexes);
+}
+
+bool UInventoryComponent::TryValidateGridAvailablility(int TopLeftIndex, FIntPoint* ItemDimensions, TArray<int>*& validatedIndexes)
+{
+	FIntPoint tileIndex = IndexToTile(TopLeftIndex); //Get the current tile
+
+	//Furthest X and Y positions from top left most index
+	int lastIndexX = tileIndex.X + ItemDimensions->X;
+	int lastIndexY = tileIndex.Y + ItemDimensions->Y;
+
+	//If it would overflow rows/columns return that this position is invalid
+	if (lastIndexX >= Columns || lastIndexY >= Rows) return false;
+
+
+	for (int x = tileIndex.X; x < lastIndexX; ++x) //get x
+	{
+		for (int y = tileIndex.Y; tileIndex.Y < lastIndexY; y++) //get y
+		{
+			int index = TileToIndex(x, y); //Get the index
+
+			validatedIndexes->Add(index); //Add this index to the array
+
+			if (InventoryGrid[index] == nullptr) //If nothing is in this array value then its clear!
+			{
+				continue;
+			}
+
+			//If we get to here then the position was not valid
+
+			validatedIndexes->Empty(); //Empty the array as it might have old values in it
+
+			return false;
+		}
+	}
+
+	//If we reach this point then the placement is valid
+	return true;
+}
+
+FIntPoint UInventoryComponent::IndexToTile(int index)
+{
+	return FIntPoint(index % Columns, index / Columns);
+}
+
+int UInventoryComponent::TileToIndex(int x, int y)
+{
+	return (y * Columns) + x;
+}
+
+
 

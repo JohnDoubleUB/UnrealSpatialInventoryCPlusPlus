@@ -26,8 +26,16 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	bool TryAddItem(UPickupObject* pickupObject);
-	
-	TArray<UPickupObject*> Items;
+
+	bool IsRoomAvailable(int TopLeftIndex, FIntPoint* ItemDimensions, TArray<int>*& validatedIndexes);
+
+	bool TryValidateGridAvailablility(int topLeftIndex, FIntPoint* ItemDimensions, TArray<int>*& validatedIndexes);
+
+	FIntPoint IndexToTile(int index);
+
+	int TileToIndex(int x, int y);
+
+	TArray<UPickupObject*> InventoryGrid;
 
 	int Rows;
 	int Columns;
