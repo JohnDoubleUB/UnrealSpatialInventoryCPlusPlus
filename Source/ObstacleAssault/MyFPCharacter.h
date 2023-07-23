@@ -70,10 +70,14 @@ public:
 	void Crouch();
 	void Jump();
 	void Interact(const bool& pressed);
+	void ToggleInventory();
 
 	void Sprint(const bool& sprint);
 
 	bool SetCrouch(const bool& crouch);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnInventoryEnabled(bool enabled);
 
 private: 
 
@@ -112,4 +116,5 @@ private:
 	bool bWasInAir;
 	bool bIsCrouching;
 	bool bIsSprinting;
+	bool bIsInInventory;
 };

@@ -33,6 +33,7 @@ public:
 	void Crouch();
 	void Jump();
 	void Interact(const bool& pressed); //pressed or released
+	void ToggleInventory();
 
 	void Sprint(const bool& sprint);
 };

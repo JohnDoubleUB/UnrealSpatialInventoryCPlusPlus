@@ -212,6 +212,12 @@ void AMyFPCharacter::Interact(const bool& pressed)
 	}
 }
 
+void AMyFPCharacter::ToggleInventory()
+{
+	bIsInInventory = !bIsInInventory;
+	OnInventoryEnabled(!bIsInInventory);
+}
+
 void AMyFPCharacter::Sprint(const bool& sprint)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Perform sprint: %s"), (sprint ? "True" : "False"));
@@ -262,7 +268,7 @@ void AMyFPCharacter::VerticalMovement(float value)
 
 void AMyFPCharacter::HorizontalRotation(float value)
 {
-	if (value)
+	if (value && !bIsInInventory)
 	{
 		AddActorLocalRotation(FRotator(0, value, 0));
 	}
@@ -270,7 +276,7 @@ void AMyFPCharacter::HorizontalRotation(float value)
 
 void AMyFPCharacter::VerticalRotation(float value)
 {
-	if (value)
+	if (value && !bIsInInventory)
 	{
 		FRotator currentRotation = cam->GetRelativeRotation();
 		currentRotation.Pitch = FMath::Clamp(cam->GetRelativeRotation().Pitch - value, -65, 65);
