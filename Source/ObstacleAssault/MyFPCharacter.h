@@ -79,6 +79,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnInventoryEnabled(bool enabled);
 
+	void InteractWithObject(IInteractableInterface* interactable);
+
 private: 
 
 	bool CanUnCrouch();

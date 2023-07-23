@@ -22,7 +22,7 @@ class OBSTACLEASSAULT_API IInteractableInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void Interact(USceneComponent* interactingComponent) = 0;
+	virtual void Interact(USceneComponent* interactingComponent, AActor* interactingActor) = 0;
 	virtual AActor* GetOwningActor() = 0;
 	virtual bool IsValid() = 0; //If the pickup is currently valid
 

@@ -17,13 +17,13 @@ AMyFPCharacter::AMyFPCharacter()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	bUseControllerRotationYaw = false;
-	
+
 	CharacterMovement = GetCharacterMovement();
-	
+
 	CapsuleComponent = GetCapsuleComponent();
-	
+
 	UncrouchTraceRadius = CapsuleComponent->GetCollisionShape().GetCapsuleRadius();
-	
+
 	cam = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	cam->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	cam->SetRelativeLocation(FVector(0, 0, 40));
@@ -31,7 +31,7 @@ AMyFPCharacter::AMyFPCharacter()
 	InteractorComponent = CreateDefaultSubobject<UInteractorComponent>(TEXT("Interactor"));
 	InteractorComponent->Actor = this;
 	InteractorComponent->ActorViewComponent = cam;
-	
+
 	//Bind to interactor event
 	InteractorComponent->OnInteractionChangeDelegate.BindUObject(this, &AMyFPCharacter::OnInteractionChange);
 
@@ -48,7 +48,7 @@ void AMyFPCharacter::BeginPlay()
 	DefaultCameraRoll = cam->GetRelativeRotation().Roll;
 	SetCrouch(false);
 
-	if (IsLocallyControlled() && PlayerHUDClass) 
+	if (IsLocallyControlled() && PlayerHUDClass)
 	{
 
 		PlayerHUD = CreateWidget<UPlayerHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0), PlayerHUDClass);
@@ -58,7 +58,7 @@ void AMyFPCharacter::BeginPlay()
 
 void AMyFPCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	if (PlayerHUD) 
+	if (PlayerHUD)
 	{
 		PlayerHUD->RemoveFromParent();
 		//We can't destroy the widget directly, let the GC take care of it.
@@ -84,7 +84,7 @@ FVector AMyFPCharacter::CameraBob(const float& DeltaTime, const bool& falling)
 	FVector curRelativeLoc = cam->GetRelativeLocation();
 	FRotator curRelativeRot = cam->GetRelativeRotation();
 
-	if (falling) 
+	if (falling)
 	{
 		bWasInAir = true;
 		SwayTimer = 0;
@@ -116,17 +116,17 @@ FVector AMyFPCharacter::CameraBob(const float& DeltaTime, const bool& falling)
 
 void AMyFPCharacter::HandleFootstep(const FVector& currentCameraPosition, const bool& isFalling)
 {
-	if (bWasInAir && !isFalling) 
+	if (bWasInAir && !isFalling)
 	{
 		PlayFootLand();
 	}
 
-	if (!bStepTaken && currentCameraPosition.Z < DefaultCameraZPos) 
+	if (!bStepTaken && currentCameraPosition.Z < DefaultCameraZPos)
 	{
 		PlayFootstep();
 		bStepTaken = true;
 	}
-	else if (bStepTaken && currentCameraPosition.Z >= DefaultCameraZPos) 
+	else if (bStepTaken && currentCameraPosition.Z >= DefaultCameraZPos)
 	{
 		bStepTaken = false;
 	}
@@ -138,7 +138,7 @@ void AMyFPCharacter::PlayFootstep()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Play Footstep"));
 
-	if (FootstepSound != nullptr) 
+	if (FootstepSound != nullptr)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, FootstepSound, GetActorLocation());
 	}
@@ -155,21 +155,21 @@ void AMyFPCharacter::PlayFootLand()
 
 void AMyFPCharacter::OnInteractionChange(bool interaction, FString* name)
 {
-	if (PlayerHUD) 
+	if (PlayerHUD)
 	{
 		PlayerHUD->SetItemName(name != nullptr ? *name : FString()); //We don't want to accidentally dereference a nullptr, things will die
 		PlayerHUD->OnInteractAvailable(interaction);
 	}
 }
 
-void AMyFPCharacter::Crouch() 
+void AMyFPCharacter::Crouch()
 {
 	SetCrouch(!bIsCrouching);
 }
 
 bool AMyFPCharacter::SetCrouch(const bool& crouch)
 {
-	if (bIsCrouching && CanUnCrouch() == false) 
+	if (bIsCrouching && CanUnCrouch() == false)
 	{
 		return false;
 	}
@@ -178,6 +178,7 @@ bool AMyFPCharacter::SetCrouch(const bool& crouch)
 	MovementSpeed = bIsCrouching ? CrouchingSpeed : WalkingSpeed;
 	return true;
 }
+
 
 bool AMyFPCharacter::CanUnCrouch()
 {
@@ -189,7 +190,7 @@ bool AMyFPCharacter::CanUnCrouch()
 	TraceParams.AddIgnoredActor(this);
 
 	//If nothing is hit then we can uncrouch!
-	return !GetWorld()->SweepSingleByChannel(HitResult, startLoc, endLoc, FQuat::Identity, ECC_Camera , CapsuleComponent->GetCollisionShape(), TraceParams);
+	return !GetWorld()->SweepSingleByChannel(HitResult, startLoc, endLoc, FQuat::Identity, ECC_Camera, CapsuleComponent->GetCollisionShape(), TraceParams);
 }
 
 
@@ -201,15 +202,21 @@ void AMyFPCharacter::Jump()
 
 void AMyFPCharacter::Interact(const bool& pressed)
 {
-	if (pressed) 
+	if (pressed)
 	{
 		IInteractableInterface* currentInteractable;
 
 		if (InteractorComponent->TryGetCurrentInteractable(currentInteractable)) //Try and get interactable if one is present
 		{
-			currentInteractable->Interact(cam);
+			InteractWithObject(currentInteractable);
 		}
 	}
+}
+
+
+void AMyFPCharacter::InteractWithObject(IInteractableInterface* interactable)
+{
+	interactable->Interact(cam, this);
 }
 
 void AMyFPCharacter::ToggleInventory()
@@ -227,7 +234,7 @@ void AMyFPCharacter::Sprint(const bool& sprint)
 		if (bIsCrouching && SetCrouch(false) == false) return; //Return if we fail to uncrouch
 		MovementSpeed = RunningSpeed;
 	}
-	else 
+	else
 	{
 		MovementSpeed = bIsCrouching ? CrouchingSpeed : WalkingSpeed;
 	}
@@ -237,7 +244,7 @@ void AMyFPCharacter::HandleCrouch(const float& DeltaTime)
 {
 	const float TargetBEH = bIsCrouching ? CrouchedEyeHeight : BaseEyeHeight;
 	const float TargetCapsuleSize = bIsCrouching ? CharacterMovement->CrouchedHalfHeight : CharacterMovement->CrouchedHalfHeight * 2;
-	
+
 	if (Controller != NULL)
 	{
 		BaseEyeHeight = FMath::FInterpTo(BaseEyeHeight, TargetBEH, DeltaTime, 10.0f);

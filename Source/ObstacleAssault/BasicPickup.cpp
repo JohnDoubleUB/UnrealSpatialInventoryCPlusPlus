@@ -7,18 +7,27 @@
 // Sets default values
 ABasicPickup::ABasicPickup()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PickupMesh"));
 	StaticMeshComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	StaticMeshComponent->SetRelativeLocation(FVector(0, 0, 0));
 }
 
-void ABasicPickup::Interact(USceneComponent* interactingComponent)
+void ABasicPickup::Interact(USceneComponent* interactingComponent, AActor* interactingActor)
+{
+	if (isValid == false) return;
+	OnInteractEvent(interactingComponent, interactingActor); //Have blueprint instance check this interact before doing anything else
+	//SetCanBeInteracted(false);
+	//InterpolationElapsed = 0.0f;
+	//TargetComponent = interactingComponent;
+}
+
+void ABasicPickup::OnBlueprintValidatedInteract(USceneComponent* interactingCamera) //If interact passed
 {
 	SetCanBeInteracted(false);
 	InterpolationElapsed = 0.0f;
-	TargetComponent = interactingComponent;
+	TargetComponent = interactingCamera;
 }
 
 // Called when the game starts or when spawned
@@ -45,12 +54,12 @@ void ABasicPickup::Tick(float DeltaTime)
 
 	InterpolationElapsed = FMath::Min(InterpolationElapsed + (InterpolationDuration * DeltaTime), 1);
 
-	if (InterpolationElapsed > 0.15 && StaticMeshComponent->CastShadow) 
+	if (InterpolationElapsed > 0.15 && StaticMeshComponent->CastShadow)
 	{
 		StaticMeshComponent->SetCastShadow(false);
 	}
 
-	if (InterpolationElapsed > 0.35f) 
+	if (InterpolationElapsed > 0.35f)
 	{
 		Destroy();
 	}

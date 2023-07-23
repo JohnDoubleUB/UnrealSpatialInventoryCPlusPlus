@@ -18,7 +18,7 @@ public:
 	// Sets default values for this actor's properties
 	ABasicPickup();
 
-	virtual void Interact(USceneComponent* interactingComponent) override;
+	virtual void Interact(USceneComponent* interactingComponent, AActor* interactingActor) override;
 	inline virtual FString* GetName() override { return &Name; };
 	inline virtual AActor* GetOwningActor() override { return this; }; //This is kinda cool
 	inline virtual bool IsValid() override { return isValid; }
@@ -39,6 +39,15 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	UStaticMeshComponent* StaticMeshComponent;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnInventoryEnabled(bool enabled);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void OnInteractEvent(USceneComponent* interactingCamera, AActor* interactingActor);
+
+	UFUNCTION(BlueprintCallable)
+	void OnBlueprintValidatedInteract(USceneComponent* interactingCamera);
 
 
 private:
