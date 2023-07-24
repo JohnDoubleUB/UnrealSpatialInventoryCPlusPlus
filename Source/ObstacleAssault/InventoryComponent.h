@@ -31,6 +31,8 @@ public:
 
 	bool TryValidateGridAvailablility(int topLeftIndex, FIntPoint* ItemDimensions, TArray<int>*& validatedIndexes);
 
+	TMap<UPickupObject*, FIntPoint> GetAllItems();
+
 	FIntPoint IndexToTile(int index);
 
 	int TileToIndex(int x, int y);

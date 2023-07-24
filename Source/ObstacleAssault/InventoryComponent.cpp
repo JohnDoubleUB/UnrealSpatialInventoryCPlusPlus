@@ -50,7 +50,7 @@ bool UInventoryComponent::TryAddItem(UPickupObject* pickupObject)
 	for (int i = 0; i < InventoryGrid.Num(); ++i)
 	{
 
-		if (IsRoomAvailable(i, Dimensions, fullyValidatedIndexes) && fullyValidatedIndexes != nullptr) //Check if this position is available
+		if (IsRoomAvailable(i, Dimensions, fullyValidatedIndexes) && fullyValidatedIndexes != nullptr) //Check if this position is available and item is valid (it should be)
 		{
 			//Add item, this is a valid position!
 			for (int x = 0; x < fullyValidatedIndexes->Num(); x++)
@@ -106,6 +106,21 @@ bool UInventoryComponent::TryValidateGridAvailablility(int TopLeftIndex, FIntPoi
 
 	//If we reach this point then the placement is valid
 	return true;
+}
+
+TMap<UPickupObject*, FIntPoint> UInventoryComponent::GetAllItems()
+{
+	TMap<UPickupObject*, FIntPoint> itemMap;
+
+	for (int i = 0; i != InventoryGrid.Num(); ++i)
+	{
+		UPickupObject* currentItem = InventoryGrid[i];
+		if (currentItem == nullptr) continue; //Skip over nullptr
+		if (itemMap.Contains(currentItem)) continue; //Skip if item is already in map
+		itemMap.Add(currentItem, IndexToTile(i));
+	}
+
+	return itemMap;
 }
 
 FIntPoint UInventoryComponent::IndexToTile(int index)
