@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType, Blueprintable)
 class OBSTACLEASSAULT_API UPickupObject : public UObject
 {
 	GENERATED_BODY()
@@ -19,6 +19,7 @@ public:
 	FIntPoint* GetDimensions() { return &Dimensions; }
 
 private: 
+	UPROPERTY(EditAnywhere)
 	FIntPoint Dimensions = FIntPoint(10, 10);
 	
 };

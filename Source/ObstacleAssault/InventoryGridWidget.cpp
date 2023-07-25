@@ -2,10 +2,10 @@
 #include "Components/ProgressBar.h"
 #include "Components/Border.h"
 
-void UInventoryGridWidget::InitializeWidget(UInventoryComponent* inventoryComponent, float tileSize)
+void UInventoryGridWidget::InitializeWidget(UInventoryComponent* inventoryComponent, float* tileSize)
 {
-	InventoryComponent = InventoryComponent;
-	TileSize = TileSize;
+	InventoryComponent = inventoryComponent;
+	TileSize = tileSize;
 
 	if (InventoryComponent == nullptr) //If the inventory component is null then we don't want to do anything else
 		return;
@@ -23,5 +23,10 @@ void UInventoryGridWidget::InitializeWidget(UInventoryComponent* inventoryCompon
 		return;
 	}
 
-	CanvasPanelSlot->SetSize(FVector2D(InventoryComponent->Columns * tileSize, InventoryComponent->Rows * tileSize));
+	CanvasPanelSlot->SetSize(FVector2D(InventoryComponent->Columns * (*TileSize), InventoryComponent->Rows * (*TileSize)));
+}
+
+bool UInventoryGridWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+	return false;
 }
