@@ -8,7 +8,7 @@
 #include "InventoryComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent, BlueprintEditableComponent) )
 class OBSTACLEASSAULT_API UInventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -39,8 +39,10 @@ public:
 
 	TArray<UPickupObject*> InventoryGrid;
 
-	int Rows;
-	int Columns;
+	UPROPERTY(EditAnywhere)
+	int Rows = 6;
+	UPROPERTY(EditAnywhere)
+	int Columns = 6;
 
 		
 };

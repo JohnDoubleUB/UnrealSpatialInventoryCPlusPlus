@@ -2,6 +2,7 @@
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PlayerHUD.h"
+#include "InventoryWidget.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -35,6 +36,9 @@ AMyFPCharacter::AMyFPCharacter()
 	//Bind to interactor event
 	InteractorComponent->OnInteractionChangeDelegate.BindUObject(this, &AMyFPCharacter::OnInteractionChange);
 
+	//Add Inventory component
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
+
 	PlayerHUDClass = nullptr;
 	PlayerHUD = nullptr;
 }
@@ -50,10 +54,23 @@ void AMyFPCharacter::BeginPlay()
 
 	if (IsLocallyControlled() && PlayerHUDClass)
 	{
+		PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
-		PlayerHUD = CreateWidget<UPlayerHUD>(UGameplayStatics::GetPlayerController(GetWorld(), 0), PlayerHUDClass);
-		PlayerHUD->AddToPlayerScreen();
+		if (PlayerHUDClass) 
+		{
+			PlayerHUD = CreateWidget<UPlayerHUD>(PlayerController, PlayerHUDClass);
+			PlayerHUD->AddToPlayerScreen();
+		}
+
+		if (InventoryWidgetClass) 
+		{
+			InventoryWidget = CreateWidget<UInventoryWidget>(PlayerController, InventoryWidgetClass);
+			InventoryWidget->InitializeWidget(InventoryComponent, &TileSize);
+		}
+
 	}
+
+
 }
 
 void AMyFPCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -223,6 +240,30 @@ void AMyFPCharacter::ToggleInventory()
 {
 	bIsInInventory = !bIsInInventory;
 	OnInventoryEnabled(!bIsInInventory);
+
+	if (InventoryWidget == nullptr) return;
+
+	if (!bIsInInventory) 
+	{
+		InventoryWidget->RemoveFromParent();
+
+		//Create an input mode
+		PlayerController->SetInputMode(FInputModeGameOnly());
+	}
+	else 
+	{
+		//Create input mode
+		FInputModeGameAndUI gameAndUIInputMode;
+
+		//Make this new widget in focus
+		gameAndUIInputMode.SetWidgetToFocus(InventoryWidget->TakeWidget());
+		gameAndUIInputMode.SetHideCursorDuringCapture(false); //Show mouse
+
+		InventoryWidget->AddToPlayerScreen();
+		PlayerController->SetInputMode(gameAndUIInputMode);
+	}
+
+	PlayerController->SetShowMouseCursor(bIsInInventory);
 }
 
 void AMyFPCharacter::Sprint(const bool& sprint)

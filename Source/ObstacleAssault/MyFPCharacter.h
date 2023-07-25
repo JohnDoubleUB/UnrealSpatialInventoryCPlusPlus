@@ -6,6 +6,7 @@
 #include "Sound/SoundCue.h"
 #include "GameFramework/Character.h"
 #include "InteractorComponent.h"
+#include "InventoryComponent.h"
 #include "Components/InputComponent.h"
 #include "Camera/CameraComponent.h"
 #include "MyFPCharacter.generated.h"
@@ -57,8 +58,17 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UPlayerHUD> PlayerHUDClass;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UInventoryWidget> InventoryWidgetClass;
+
+	UPROPERTY(EditAnywhere)
+	float TileSize = 50.0;
+
 	UPROPERTY()
 	class UPlayerHUD* PlayerHUD;
+
+	UPROPERTY()
+	class UInventoryWidget* InventoryWidget;
 
 	//Inputs
 	void HorizontalMovement(float value);
@@ -102,9 +112,15 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Components")
 	UInteractorComponent* InteractorComponent;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Components")
+	UInventoryComponent* InventoryComponent;
+
 
 	UPROPERTY(VisibleAnywhere, Category = "Debug")
 	FVector CurrentVelocity;
+
+	APlayerController* PlayerController;
 
 	float BobTimer;
 	float SwayTimer;
