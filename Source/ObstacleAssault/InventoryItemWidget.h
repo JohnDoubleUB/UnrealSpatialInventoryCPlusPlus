@@ -9,7 +9,7 @@ class OBSTACLEASSAULT_API UInventoryItemWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	void InitializeWidget();
+	void InitializeWidget(class UPickupObject* NewPickupObject, float NewTileSize);
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UBorder* BackgroundBorder;
@@ -27,6 +27,11 @@ private:
 	UPROPERTY(EditAnywhere)
 	class UPickupObject* PickupObject;
 
+	class UCanvasPanelSlot* ItemImageCanvasPanelSlot;
 
-
+protected:
+	void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
+	class FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
 };

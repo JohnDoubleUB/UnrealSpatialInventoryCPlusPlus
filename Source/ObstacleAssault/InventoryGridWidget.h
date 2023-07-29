@@ -5,6 +5,7 @@
 #include "Components/CanvasPanelSlot.h"
 #include "InventoryComponent.h"
 #include "InventoryGridLineStruct.h"
+#include "InventoryItemWidget.h"
 #include "InventoryGridWidget.generated.h"
 
 UCLASS(Abstract)
@@ -31,6 +32,9 @@ private:
 	UCanvasPanelSlot* CanvasPanelSlot;
 	float* TileSize;
 	TArray<FInventoryGridLineStruct> Lines;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UInventoryItemWidget> ItemWidgetClass;
 
 protected:
 	bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;

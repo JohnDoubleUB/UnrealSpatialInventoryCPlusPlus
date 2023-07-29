@@ -74,7 +74,10 @@ void UInventoryGridWidget::CreateLineSegments()
 
 void UInventoryGridWidget::Refresh()
 {
-	if (GridCanvasPanel == nullptr) return;
+	if (GridCanvasPanel == nullptr || ItemWidgetClass == nullptr) 
+	{
+		return; 
+	}
 
 	GridCanvasPanel->ClearChildren();
 
