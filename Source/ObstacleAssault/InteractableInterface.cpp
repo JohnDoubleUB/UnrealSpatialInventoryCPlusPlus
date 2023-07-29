@@ -5,10 +5,10 @@
 
 // Add default functionality here for any IInteractableInterface functions that are not pure virtual.
 
-FString* IInteractableInterface::GetName()
-{
-	return nullptr;
-}
+//FString* IInteractableInterface::GetName()
+//{
+//	return nullptr;
+//}
 
 EInteractionType IInteractableInterface::GetInteractionType()
 {

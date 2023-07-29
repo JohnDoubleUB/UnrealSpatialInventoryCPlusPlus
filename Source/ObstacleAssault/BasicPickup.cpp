@@ -2,7 +2,9 @@
 
 #include "GameFramework/Actor.h"
 #include "BasicPickup.h"
+#include "PickupObject.h"
 #include "CustomTraceChannelNames.h"
+#include "InventoryHandlerInterface.h"
 
 // Sets default values
 ABasicPickup::ABasicPickup()
@@ -14,13 +16,18 @@ ABasicPickup::ABasicPickup()
 	StaticMeshComponent->SetRelativeLocation(FVector(0, 0, 0));
 }
 
-void ABasicPickup::Interact(USceneComponent* interactingComponent, AActor* interactingActor)
+void ABasicPickup::Interact(USceneComponent* interactingComponent, AActor* interactingActor, IInventoryHandlerInterface* inventoryHandlerInterface)
 {
 	if (isValid == false) return;
 	OnInteractEvent(interactingComponent, interactingActor); //Have blueprint instance check this interact before doing anything else
-	//SetCanBeInteracted(false);
-	//InterpolationElapsed = 0.0f;
-	//TargetComponent = interactingComponent;
+
+	if (inventoryHandlerInterface && inventoryHandlerInterface->TryAddItemToInventory(GeneratePickupObject()))
+	{
+		SetCanBeInteracted(false);
+		InterpolationElapsed = 0.0f;
+		TargetComponent = interactingComponent;
+	}
+
 }
 
 void ABasicPickup::OnBlueprintValidatedInteract(USceneComponent* interactingCamera) //If interact passed
@@ -28,6 +35,13 @@ void ABasicPickup::OnBlueprintValidatedInteract(USceneComponent* interactingCame
 	SetCanBeInteracted(false);
 	InterpolationElapsed = 0.0f;
 	TargetComponent = interactingCamera;
+}
+
+UPickupObject* ABasicPickup::GeneratePickupObject()
+{
+	UPickupObject* newPickupObject = NewObject<UPickupObject>();
+	newPickupObject->SetParameters(Dimensions, Icon, IconRotated, ItemClass);
+	return newPickupObject;
 }
 
 // Called when the game starts or when spawned

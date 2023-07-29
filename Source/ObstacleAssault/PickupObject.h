@@ -7,19 +7,37 @@
 #include "PickupObject.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS(BlueprintType, Blueprintable)
 class OBSTACLEASSAULT_API UPickupObject : public UObject
 {
 	GENERATED_BODY()
 
-
 public:
 	FIntPoint* GetDimensions() { return &Dimensions; }
+	void SetDimensions(FIntPoint NewDimensions) { Dimensions = NewDimensions; }
+	bool GetIsRotated() { return bIsRotated; }
+	UMaterialInterface* GetIconMaterialInterface() { return IconMaterialInterface; }
+	UMaterialInterface* GetIconRotatedMaterialInterface() { return IconRotatedMaterialInterface; }
+	TSubclassOf<class ABasicPickup> GetItemSubclass() { return ItemClass; }
 
-private: 
+	UPickupObject* SetParameters(FIntPoint NewDimensions, UMaterialInterface* NewIconMaterialInterface, UMaterialInterface* NewIconRotatedMaterialInterface, TSubclassOf<class ABasicPickup> NewItemClass);
+
+private:
 	UPROPERTY(EditAnywhere)
-	FIntPoint Dimensions = FIntPoint(10, 10);
-	
+		FIntPoint Dimensions = FIntPoint(10, 10);
+
+	UPROPERTY(EditAnywhere)
+		bool bIsRotated;
+
+	UPROPERTY(EditAnywhere)
+		UMaterialInterface* IconMaterialInterface;
+
+	UPROPERTY(EditAnywhere)
+		UMaterialInterface* IconRotatedMaterialInterface;
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class ABasicPickup> ItemClass;
+
 };

@@ -9,7 +9,6 @@ void UInventoryWidget::InitializeWidget(UInventoryComponent* inventoryComponent,
 	InventoryComponent = inventoryComponent;
 	TileSize = tileSize;
 
-	//TODO: Initialize Inventory Grid widget
 	if (InventoryGridWidget == nullptr) return;
 	InventoryGridWidget->InitializeWidget(inventoryComponent, tileSize);
 	OnWidgetInitialized(inventoryComponent, *tileSize);
@@ -22,7 +21,9 @@ bool UInventoryWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDrop
 	if (pickupObject == nullptr) //Null check
 		return false;
 
-	SpawnItemFromActor(pickupObject, InventoryComponent->GetOwner(), true);
+	UWorld* world = GetWorld();
+
+	SpawnItemFromActor(GetWorld(), pickupObject, InventoryComponent->GetOwner(), true);
 
 	return false;
 }

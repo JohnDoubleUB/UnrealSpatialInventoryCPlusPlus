@@ -105,13 +105,16 @@ bool UInteractorComponent::TryGetInteractableFromHit(FHitResult& hitResult, IInt
 		return true;
 	}
 	
-	//Check if it implements the correct interface, return false if it doesn't
-	if (hitActor->GetClass()->ImplementsInterface(UInteractableInterface::StaticClass()) == false) 
+	//Docs say you should cast and then check if its null
+	IInteractableInterface* newInteractable = Cast<IInteractableInterface>(hitActor);
+
+	if (!newInteractable) 
 	{
 		return false; 
 	}
 
-	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Orange, FString::Printf(TEXT("New item found, casting!")));
+
+	//GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Orange, FString::Printf(TEXT("New item found, casting!")));
 	//Assign the pointer back to the interactable argument passed in
 	interactable = Cast<IInteractableInterface>(hitActor);
 

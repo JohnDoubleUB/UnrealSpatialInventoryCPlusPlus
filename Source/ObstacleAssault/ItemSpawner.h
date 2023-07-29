@@ -6,6 +6,6 @@
 class UItemSpawner
 {
 	protected:
-		void SpawnItemFromActor(UPickupObject* pickupObject, AActor* actor, bool groundClamp);
+		void SpawnItemFromActor(UWorld* world, UPickupObject* pickupObject, AActor* actor, bool groundClamp);
 
 };

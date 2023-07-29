@@ -18,7 +18,7 @@ public:
 	// Sets default values for this actor's properties
 	ABasicPickup();
 
-	virtual void Interact(USceneComponent* interactingComponent, AActor* interactingActor) override;
+	virtual void Interact(USceneComponent* interactingComponent, AActor* interactingActor, class IInventoryHandlerInterface* inventoryHandlerInterface) override;
 	inline virtual FString* GetName() override { return &Name; };
 	inline virtual AActor* GetOwningActor() override { return this; }; //This is kinda cool
 	inline virtual bool IsValid() override { return isValid; }
@@ -49,6 +49,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnBlueprintValidatedInteract(USceneComponent* interactingCamera);
 
+	class UPickupObject* GeneratePickupObject();
+
+
 
 private:
 	bool isValid = true;
@@ -56,5 +59,15 @@ private:
 	float InterpolationElapsed = 0.0f;
 
 	void SetCanBeInteracted(const bool& canBeInteracted);
+
+	UPROPERTY(EditAnywhere)
+	FIntPoint Dimensions = FIntPoint(1, 1);
+	UPROPERTY(EditAnywhere)
+	class UMaterialInstance* Icon;
+	UPROPERTY(EditAnywhere)
+	class UMaterialInstance* IconRotated;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Blueprint")
+	TSubclassOf<class ABasicPickup> ItemClass;
 
 };

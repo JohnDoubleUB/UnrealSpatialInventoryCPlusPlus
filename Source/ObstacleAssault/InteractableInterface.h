@@ -7,6 +7,26 @@
 #include "InteractableInterface.generated.h"
 
 // This class does not need to be modified.
+
+/*
+
+TIL: If I was exposing any of this stuff to blueprints I.e. I set the paramater as UINTEFACE(BlueprintType), then I would be advised to use unreals weird interface safety checks
+i.e:
+in this class we wouldn't override, we'd instead just use 
+UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category=Trigger Reaction) //THis would allow implementation in blueprint on C++ 
+bool interfaceFunction();
+
+then in classes that implement this interface we would have:
+UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category=Trigger Reaction) //This would allow implementation in blueprint on C++
+bool interfaceFunction();
+
+bool interfaceFunction_implementation() override; // This gets generated on compile time, this is how you'd override this event in C++
+
+then when calling a casted interface of this type you would use
+castedInterface->Execute_interfaceFunction(); and this would safely call the override
+unreal generates Excute_ for C++ use in these kinds of interfaces
+
+*/
 UINTERFACE(MinimalAPI)
 class UInteractableInterface : public UInterface
 {
@@ -22,13 +42,16 @@ class OBSTACLEASSAULT_API IInteractableInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void Interact(USceneComponent* interactingComponent, AActor* interactingActor) = 0;
+	virtual void Interact(USceneComponent* interactingComponent, AActor* interactingActor, class IInventoryHandlerInterface* inventoryHandlerInterface) = 0;
 	virtual AActor* GetOwningActor() = 0;
 	virtual bool IsValid() = 0; //If the pickup is currently valid
 
-	virtual FString* GetName();
+	virtual FString* GetName() = 0;
+
 
 	EInteractionType GetInteractionType();
+
+
 
 protected:
 	EInteractionType InteractionType;

@@ -233,7 +233,17 @@ void AMyFPCharacter::Interact(const bool& pressed)
 
 void AMyFPCharacter::InteractWithObject(IInteractableInterface* interactable)
 {
-	interactable->Interact(cam, this);
+	interactable->Interact(cam, this, this);
+}
+
+bool AMyFPCharacter::TryAddItemToInventory(UPickupObject* pickupObject)
+{
+	if (InventoryComponent == nullptr) 
+	{
+		return false;
+	}
+
+	return InventoryComponent->TryAddItem(pickupObject);
 }
 
 void AMyFPCharacter::ToggleInventory()

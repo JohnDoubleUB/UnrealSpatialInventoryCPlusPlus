@@ -31,6 +31,11 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (IsDirty) 
+	{
+		IsDirty = false;
+		OnInventoryChangeDelegate.Broadcast(); //Broadcast is used for multideligate
+	}
 	// ...
 }
 
@@ -53,14 +58,18 @@ bool UInventoryComponent::TryAddItem(UPickupObject* pickupObject)
 		if (IsRoomAvailable(i, Dimensions, fullyValidatedIndexes) && fullyValidatedIndexes != nullptr) //Check if this position is available and item is valid (it should be)
 		{
 			//Add item, this is a valid position!
-			for (int x = 0; x < fullyValidatedIndexes->Num(); x++)
+	/*		for (int x = 0; x < fullyValidatedIndexes->Num(); x++)
 			{
 				InventoryGrid[x] = pickupObject;
-			}
+			}*/
+
+			AddItemAtInventoryGridIndexes(pickupObject, fullyValidatedIndexes);
 
 			return true;
 		}
 	}
+
+	//TODO: Add try rotate object here
 
 	return false;
 }
@@ -106,6 +115,27 @@ bool UInventoryComponent::TryValidateGridAvailablility(int TopLeftIndex, FIntPoi
 
 	//If we reach this point then the placement is valid
 	return true;
+}
+
+void UInventoryComponent::RemoveItem(UPickupObject* pickupObject)
+{
+	if (pickupObject == nullptr) return;
+
+	for (int i = 0; i != InventoryGrid.Num(); ++i)
+	{
+		if (InventoryGrid[i] != pickupObject) continue;
+		InventoryGrid[i] = nullptr;
+		IsDirty = true;
+		break;
+	}
+}
+
+void UInventoryComponent::AddItemAtInventoryGridIndexes(UPickupObject* pickupObject, TArray<int>* validatedIndexPositions)
+{
+	for (int x = 0; x < validatedIndexPositions->Num(); x++)
+	{
+		InventoryGrid[x] = pickupObject;
+	}
 }
 
 TMap<UPickupObject*, FIntPoint> UInventoryComponent::GetAllItems()

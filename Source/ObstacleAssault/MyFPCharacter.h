@@ -9,10 +9,11 @@
 #include "InventoryComponent.h"
 #include "Components/InputComponent.h"
 #include "Camera/CameraComponent.h"
+#include "InventoryHandlerInterface.h"
 #include "MyFPCharacter.generated.h"
 
 UCLASS()
-class OBSTACLEASSAULT_API AMyFPCharacter : public ACharacter
+class OBSTACLEASSAULT_API AMyFPCharacter : public ACharacter, public IInventoryHandlerInterface
 {
 	GENERATED_BODY()
 
@@ -90,6 +91,9 @@ public:
 	void OnInventoryEnabled(bool enabled);
 
 	void InteractWithObject(IInteractableInterface* interactable);
+
+	//Override from InventoryHandler
+	bool TryAddItemToInventory(UPickupObject* pickupObject) override;
 
 private: 
 

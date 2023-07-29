@@ -7,6 +7,7 @@
 #include "Components/ActorComponent.h"
 #include "InventoryComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FInventoryChangeDelegate);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent, BlueprintEditableComponent) )
 class OBSTACLEASSAULT_API UInventoryComponent : public UActorComponent
@@ -31,6 +32,10 @@ public:
 
 	bool TryValidateGridAvailablility(int topLeftIndex, FIntPoint* ItemDimensions, TArray<int>*& validatedIndexes);
 
+	void RemoveItem(UPickupObject* pickupObject);
+
+	void AddItemAtInventoryGridIndexes(UPickupObject* pickupObject, TArray<int>* validatedIndexPositions);
+
 	TMap<UPickupObject*, FIntPoint> GetAllItems();
 
 	FIntPoint IndexToTile(int index);
@@ -39,10 +44,15 @@ public:
 
 	TArray<UPickupObject*> InventoryGrid;
 
+	FInventoryChangeDelegate OnInventoryChangeDelegate;
+
 	UPROPERTY(EditAnywhere)
 	int Rows = 6;
 	UPROPERTY(EditAnywhere)
 	int Columns = 6;
+
+private:
+	bool IsDirty;
 
 		
 };
