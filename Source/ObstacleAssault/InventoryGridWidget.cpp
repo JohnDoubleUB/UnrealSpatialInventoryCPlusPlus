@@ -86,20 +86,33 @@ void UInventoryGridWidget::Refresh()
 
 	for (auto& Elem : allItems)
 	{
-		//Create widget for item
-		//Give tilesize
-		// Bind an event it has to an on remove event
-		// Add as child to canvas panel
-		// Cast to panel slot
-		// Set auto size
-		// Set position
-		//CreateWidget<>
+		UInventoryItemWidget* newWidget = CreateWidget<UInventoryItemWidget>(this, ItemWidgetClass);
+		newWidget->InitializeWidget(Elem.Key, *TileSize);
+
+		newWidget->OnRemovedDelegate.AddUObject(this, &UInventoryGridWidget::OnItemRemovedEvent);
+		
+		UPanelSlot* panelSlot = GridCanvasPanel->AddChild(newWidget);
+		UCanvasPanelSlot* gridCanvasPanelSlot = Cast<UCanvasPanelSlot>(panelSlot);
+		
+		if (gridCanvasPanelSlot)
+		{
+			float tileSize = *TileSize;
+			gridCanvasPanelSlot->SetAutoSize(true);
+			gridCanvasPanelSlot->SetPosition(FVector2D(Elem.Value.X * tileSize, Elem.Value.Y * tileSize));
+		}
 	}
+
+}
+
+void UInventoryGridWidget::OnItemRemovedEvent(UPickupObject* PickupObject)
+{
 
 }
 
 bool UInventoryGridWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
+	//InOperation->Payload
+
 	return false;
 }
 

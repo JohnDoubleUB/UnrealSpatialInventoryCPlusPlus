@@ -20,6 +20,7 @@ public:
 	bool GetIsRotated() { return bIsRotated; }
 	UMaterialInterface* GetIconMaterialInterface() { return IconMaterialInterface; }
 	UMaterialInterface* GetIconRotatedMaterialInterface() { return IconRotatedMaterialInterface; }
+	UMaterialInterface* GetIcon();
 	TSubclassOf<class ABasicPickup> GetItemSubclass() { return ItemClass; }
 
 	UPickupObject* SetParameters(FIntPoint NewDimensions, UMaterialInterface* NewIconMaterialInterface, UMaterialInterface* NewIconRotatedMaterialInterface, TSubclassOf<class ABasicPickup> NewItemClass);

@@ -49,8 +49,37 @@ FReply UInventoryItemWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry
 	return reply.NativeReply; //This requires private dependencies  "Slate", "SlateCore"  to be added in Build.cs
 }
 
+//Useful reference: https://github.com/dengboltj/ue4-umg-drag/blob/master/BagsProject/Source/BagsProject/Item.cpp
 void UInventoryItemWidget::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
+{	
+	OutOperation = UWidgetBlueprintLibrary::CreateDragDropOperation(OutOperation->StaticClass());
+
+	OutOperation->Payload = PickupObject;
+	OutOperation->DefaultDragVisual = this;
+	OutOperation->Pivot = EDragPivot::CenterCenter;
+
+	OnRemovedDelegate.Broadcast(PickupObject);
+	RemoveFromParent();
+}
+
+void UInventoryItemWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
-	//TODO: Continue this part of the code
-	//UWidgetBlueprintLibrary::CreateDragDropOperation(UDragDropOperation)
+	if (PickupObject == nullptr) 
+	{
+		return; 
+	}
+
+	UMaterialInterface* matInstance = PickupObject->GetIcon();
+
+	if (CurrentIcon == matInstance) 
+	{
+		return;
+	}
+	 //TODO: Possibly improve this
+	CurrentIcon = matInstance;
+
+	FSlateBrush newSlateBrush = UWidgetBlueprintLibrary::MakeBrushFromMaterial(CurrentIcon, FMath::FloorToInt(Size.X), FMath::FloorToInt(Size.Y));
+
+	ItemImage->Brush = newSlateBrush;
+
 }

@@ -3,6 +3,11 @@
 
 #include "PickupObject.h"
 
+UMaterialInterface* UPickupObject::GetIcon()
+{
+	return bIsRotated ? IconRotatedMaterialInterface : IconMaterialInterface;
+}
+
 UPickupObject* UPickupObject::SetParameters(FIntPoint NewDimensions, UMaterialInterface* NewIconMaterialInterface, UMaterialInterface* NewIconRotatedMaterialInterface, TSubclassOf<class ABasicPickup> NewItemClass)
 {
 	Dimensions = NewDimensions;

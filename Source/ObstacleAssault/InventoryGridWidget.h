@@ -36,6 +36,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UInventoryItemWidget> ItemWidgetClass;
 
+	void OnItemRemovedEvent(UPickupObject* PickupObject);
+	//void GetObjectFromPayload
+
 protected:
 	bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	int32 NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const override;
