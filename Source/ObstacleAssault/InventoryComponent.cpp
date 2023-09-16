@@ -49,13 +49,14 @@ bool UInventoryComponent::TryAddItem(UPickupObject* pickupObject)
 	if (Dimensions->X < 1 || Dimensions->Y < 1) return false; //If the dimensions are 0 then they are invalid
 	if (Dimensions->X * Dimensions->Y > InventoryGrid.Num()) return false; //If item could not possibly fit in inventory
 
-	TArray<int>* fullyValidatedIndexes = nullptr;
+	TArray<int> fullyValidatedIndexes;
+	TArray<int>* fullyValidatedIndexesPtr = &fullyValidatedIndexes;
 
 	//Iterate over each grid tile
 	for (int i = 0; i < InventoryGrid.Num(); ++i)
 	{
 
-		if (IsRoomAvailable(i, Dimensions, fullyValidatedIndexes) && fullyValidatedIndexes != nullptr) //Check if this position is available and item is valid (it should be)
+		if (IsRoomAvailable(i, Dimensions, fullyValidatedIndexesPtr) && fullyValidatedIndexesPtr != nullptr) //Check if this position is available and item is valid (it should be)
 		{
 			//Add item, this is a valid position!
 	/*		for (int x = 0; x < fullyValidatedIndexes->Num(); x++)
@@ -63,7 +64,7 @@ bool UInventoryComponent::TryAddItem(UPickupObject* pickupObject)
 				InventoryGrid[x] = pickupObject;
 			}*/
 
-			AddItemAtInventoryGridIndexes(pickupObject, fullyValidatedIndexes);
+			AddItemAtInventoryGridIndexes(pickupObject, fullyValidatedIndexesPtr);
 
 			return true;
 		}
@@ -84,6 +85,9 @@ bool UInventoryComponent::TryValidateGridAvailablility(int TopLeftIndex, FIntPoi
 {
 	FIntPoint tileIndex = IndexToTile(TopLeftIndex); //Get the current tile
 
+	FString isNull = validatedIndexes == nullptr ? TEXT("True") : TEXT("False");
+
+
 	//Furthest X and Y positions from top left most index
 	int lastIndexX = tileIndex.X + ItemDimensions->X;
 	int lastIndexY = tileIndex.Y + ItemDimensions->Y;
@@ -91,12 +95,19 @@ bool UInventoryComponent::TryValidateGridAvailablility(int TopLeftIndex, FIntPoi
 	//If it would overflow rows/columns return that this position is invalid
 	if (lastIndexX >= Columns || lastIndexY >= Rows) return false;
 
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("isNull: %s, tileIndex: x: %d, y: %d, lastIndexX: %d, lastIndexY: %d"), *isNull, tileIndex.X, tileIndex.Y, lastIndexX, lastIndexY));
+
+	//return false;
+
 
 	for (int x = tileIndex.X; x < lastIndexX; ++x) //get x
 	{
-		for (int y = tileIndex.Y; tileIndex.Y < lastIndexY; y++) //get y
+		for (int y = tileIndex.Y; y < lastIndexY; y++) //get y
 		{
 			int index = TileToIndex(x, y); //Get the index
+
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("xValue: %d, yValue: %d, tileToIndex: %d"),x, y, index));
+			//UE_LOG(LogTemp, Warning, TEXT("xValue: %d, yValue: %d, tileToIndex: %d"), x, y, index);
 
 			validatedIndexes->Add(index); //Add this index to the array
 

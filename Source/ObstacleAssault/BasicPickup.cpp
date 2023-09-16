@@ -19,7 +19,9 @@ ABasicPickup::ABasicPickup()
 void ABasicPickup::Interact(USceneComponent* interactingComponent, AActor* interactingActor, IInventoryHandlerInterface* inventoryHandlerInterface)
 {
 	if (isValid == false) return;
-	OnInteractEvent(interactingComponent, interactingActor); //Have blueprint instance check this interact before doing anything else
+	//OnInteractEvent(interactingComponent, interactingActor); //Have blueprint instance check this interact before doing anything else
+
+	UE_LOG(LogTemp, Warning, TEXT("Trying to pickup!"));
 
 	if (inventoryHandlerInterface && inventoryHandlerInterface->TryAddItemToInventory(GeneratePickupObject()))
 	{
@@ -40,6 +42,14 @@ void ABasicPickup::OnBlueprintValidatedInteract(USceneComponent* interactingCame
 UPickupObject* ABasicPickup::GeneratePickupObject()
 {
 	UPickupObject* newPickupObject = NewObject<UPickupObject>();
+
+	FString isIconNull = Icon == nullptr ? TEXT("True") : TEXT("False");
+	FString isIconRotatedNull = IconRotated == nullptr ? TEXT("True") : TEXT("False");
+	FString isItemClassNull = ItemClass == nullptr ? TEXT("True") : TEXT("False");
+
+
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Dimensions: x: %d, y: %d, Icon null: %s, IconRotated null: %s, ItemClass null: %s"), Dimensions.X, Dimensions.Y, *isIconNull, *isIconRotatedNull, *isItemClassNull));
+
 	newPickupObject->SetParameters(Dimensions, Icon, IconRotated, ItemClass);
 	return newPickupObject;
 }
