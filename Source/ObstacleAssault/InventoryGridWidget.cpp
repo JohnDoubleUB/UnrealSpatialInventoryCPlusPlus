@@ -1,4 +1,5 @@
 #include "InventoryGridWidget.h"
+#include "PickupObject.h"
 #include "Components/ProgressBar.h"
 #include "Components/Border.h"
 #include "Components/CanvasPanel.h"
@@ -121,18 +122,23 @@ bool UInventoryGridWidget::NativeOnDrop(const FGeometry& InGeometry, const FDrag
 	if (pickupObjectPayload != nullptr)
 	{
 		FIntPoint* pickupDimensions = pickupObjectPayload->GetDimensions();
-		//TODO: Continue this function, look at BP_InventoryGrid_Widget2 On Drop for implementation details
-		//DragItemTopLeftTile(DragMousePosition, pickupDimensions)
-		if (InventoryComponent->TryValidateGridAvailablility(0, pickupDimensions, fullyValidatedIndexesPtr))
+
+		if (InventoryComponent->TryValidateGridAvailablility(DragItemTopLeftTile(DragMousePosition, pickupDimensions), pickupDimensions, fullyValidatedIndexesPtr))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Hello, Unreal! This is a warning message. Yeeeee"));
-
-
-
-			return true;
+			//Room is available
+			//UE_LOG(LogTemp, Warning, TEXT("Hello, Unreal! This is a warning message. Yeeeee"));
+			InventoryComponent->AddItemAtInventoryGridIndexes(pickupObjectPayload, fullyValidatedIndexes);
 		}
+		else if (!InventoryComponent->TryAddItem(pickupObjectPayload)) //Check if item can be added back
+		{
+			//If not we spawn it
+			SpawnItemFromActor(GetWorld(), pickupObjectPayload, InventoryComponent->GetOwner(), true);
+		}
+
+		return true;
 	}
 
+	//Room was not available
 	return false;
 }
 
@@ -146,6 +152,9 @@ int32 UInventoryGridWidget::NativePaint(const FPaintArgs& Args, const FGeometry&
 	{
 		UWidgetBlueprintLibrary::DrawLine(paintContext, Line.Start + localTopLeft, Line.End + localTopLeft, FLinearColor(0.5f, 0.5f, 0.5f, 0.5f));
 	}
+
+	//TODO: Add in the paint code for the drag and drop color display
+	//Almost done!
 
 	return int32();
 }

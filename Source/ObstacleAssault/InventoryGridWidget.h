@@ -4,12 +4,13 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/CanvasPanelSlot.h"
 #include "InventoryComponent.h"
+#include "ItemSpawner.h"
 #include "InventoryGridLineStruct.h"
 #include "InventoryItemWidget.h"
 #include "InventoryGridWidget.generated.h"
 
 UCLASS(Abstract)
-class OBSTACLEASSAULT_API UInventoryGridWidget : public UUserWidget
+class OBSTACLEASSAULT_API UInventoryGridWidget : public UUserWidget, public UItemSpawner
 {
 	GENERATED_BODY()
 

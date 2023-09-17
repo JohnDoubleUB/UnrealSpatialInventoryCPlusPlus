@@ -87,18 +87,22 @@ bool UInventoryComponent::IsRoomAvailable(int TopLeftIndex, FIntPoint* ItemDimen
 bool UInventoryComponent::TryValidateGridAvailablility(int TopLeftIndex, FIntPoint* ItemDimensions, TArray<int>*& validatedIndexes)
 {
 	FIntPoint tileIndex = IndexToTile(TopLeftIndex); //Get the current tile
+	return TryValidateGridAvailablility(tileIndex, ItemDimensions, validatedIndexes);
+}
 
+bool UInventoryComponent::TryValidateGridAvailablility(FIntPoint TileIndex, FIntPoint* ItemDimensions, TArray<int>*& validatedIndexes)
+{
 	//Furthest X and Y positions from top left most index
-	int lastIndexX = tileIndex.X + ItemDimensions->X;
-	int lastIndexY = tileIndex.Y + ItemDimensions->Y;
+	int lastIndexX = TileIndex.X + ItemDimensions->X;
+	int lastIndexY = TileIndex.Y + ItemDimensions->Y;
 
 	//If it would overflow rows/columns return that this position is invalid
 	if (lastIndexX >= Columns || lastIndexY >= Rows) return false;
 
 
-	for (int x = tileIndex.X; x < lastIndexX; ++x) //get x
+	for (int x = TileIndex.X; x < lastIndexX; ++x) //get x
 	{
-		for (int y = tileIndex.Y; y < lastIndexY; y++) //get y
+		for (int y = TileIndex.Y; y < lastIndexY; y++) //get y
 		{
 			int index = TileToIndex(x, y); //Get the index
 

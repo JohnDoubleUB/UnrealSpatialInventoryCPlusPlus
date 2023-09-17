@@ -21,9 +21,9 @@ bool UInventoryWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDrop
 	if (pickupObject == nullptr) //Null check
 		return false;
 
-	UWorld* world = GetWorld();
+	//UWorld* world = GetWorld();
 
 	SpawnItemFromActor(GetWorld(), pickupObject, InventoryComponent->GetOwner(), true);
 
-	return false;
+	return true;
 }
