@@ -19,7 +19,9 @@ UInventoryComponent::UInventoryComponent()
 void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	InventoryGrid.SetNumUninitialized(Rows * Columns); //Initialize the Inventory grid
+	InventoryGrid.SetNum(Rows * Columns); //Initialize the Inventory grid
+	//NOTE: SetNumUninitiallized will mean that the array might hold whatever data was previously at that memory address, this is gross
+	//InventoryGrid.SetNum
 
 	// ...
 
@@ -33,6 +35,7 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 	if (IsDirty) 
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Component was dirty"));
 		IsDirty = false;
 		OnInventoryChangeDelegate.Broadcast(); //Broadcast is used for multideligate
 	}
@@ -56,7 +59,7 @@ bool UInventoryComponent::TryAddItem(UPickupObject* pickupObject)
 	for (int i = 0; i < InventoryGrid.Num(); ++i)
 	{
 
-		if (IsRoomAvailable(i, Dimensions, fullyValidatedIndexesPtr) && fullyValidatedIndexesPtr != nullptr) //Check if this position is available and item is valid (it should be)
+		if (TryValidateGridAvailablility(i, Dimensions, fullyValidatedIndexesPtr) && fullyValidatedIndexesPtr != nullptr) //Check if this position is available and item is valid (it should be)
 		{
 			//Add item, this is a valid position!
 	/*		for (int x = 0; x < fullyValidatedIndexes->Num(); x++)
@@ -64,7 +67,7 @@ bool UInventoryComponent::TryAddItem(UPickupObject* pickupObject)
 				InventoryGrid[x] = pickupObject;
 			}*/
 
-			AddItemAtInventoryGridIndexes(pickupObject, fullyValidatedIndexesPtr);
+			AddItemAtInventoryGridIndexes(pickupObject, fullyValidatedIndexes);
 
 			return true;
 		}
@@ -85,9 +88,6 @@ bool UInventoryComponent::TryValidateGridAvailablility(int TopLeftIndex, FIntPoi
 {
 	FIntPoint tileIndex = IndexToTile(TopLeftIndex); //Get the current tile
 
-	FString isNull = validatedIndexes == nullptr ? TEXT("True") : TEXT("False");
-
-
 	//Furthest X and Y positions from top left most index
 	int lastIndexX = tileIndex.X + ItemDimensions->X;
 	int lastIndexY = tileIndex.Y + ItemDimensions->Y;
@@ -95,19 +95,12 @@ bool UInventoryComponent::TryValidateGridAvailablility(int TopLeftIndex, FIntPoi
 	//If it would overflow rows/columns return that this position is invalid
 	if (lastIndexX >= Columns || lastIndexY >= Rows) return false;
 
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("isNull: %s, tileIndex: x: %d, y: %d, lastIndexX: %d, lastIndexY: %d"), *isNull, tileIndex.X, tileIndex.Y, lastIndexX, lastIndexY));
-
-	//return false;
-
 
 	for (int x = tileIndex.X; x < lastIndexX; ++x) //get x
 	{
 		for (int y = tileIndex.Y; y < lastIndexY; y++) //get y
 		{
 			int index = TileToIndex(x, y); //Get the index
-
-			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("xValue: %d, yValue: %d, tileToIndex: %d"),x, y, index));
-			//UE_LOG(LogTemp, Warning, TEXT("xValue: %d, yValue: %d, tileToIndex: %d"), x, y, index);
 
 			validatedIndexes->Add(index); //Add this index to the array
 
@@ -136,22 +129,41 @@ void UInventoryComponent::RemoveItem(UPickupObject* pickupObject)
 	{
 		if (InventoryGrid[i] != pickupObject) continue;
 		InventoryGrid[i] = nullptr;
-		IsDirty = true;
-		break;
 	}
+	IsDirty = true;
 }
 
-void UInventoryComponent::AddItemAtInventoryGridIndexes(UPickupObject* pickupObject, TArray<int>* validatedIndexPositions)
+void UInventoryComponent::AddItemAtInventoryGridIndexes(UPickupObject* pickupObject, TArray<int> validatedIndexPositions)
 {
-	for (int x = 0; x < validatedIndexPositions->Num(); x++)
+	for (int x = 0; x < validatedIndexPositions.Num(); x++)
 	{
-		InventoryGrid[x] = pickupObject;
+		int indexToSet = validatedIndexPositions[x];
+		InventoryGrid[indexToSet] = pickupObject;
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("indexToSet: %d"), indexToSet));
 	}
+
+	//
+	//for (int y = 0; y < InventoryGrid.Num(); y++) 
+	//{
+	//	UPickupObject* gridIndex = InventoryGrid[y];
+
+	//	if (gridIndex != nullptr) 
+	//	{
+	//		FIntPoint dimensions = *gridIndex->GetDimensions();
+	//		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("index: %d, item dimensions; x: %d y: %d"), y, dimensions.X, dimensions.Y));
+	//	}
+
+
+	//}
+
+	IsDirty = true;
 }
 
 TMap<UPickupObject*, FIntPoint> UInventoryComponent::GetAllItems()
 {
 	TMap<UPickupObject*, FIntPoint> itemMap;
+
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("To iterate over %d"), InventoryGrid.Num()));
 
 	for (int i = 0; i != InventoryGrid.Num(); ++i)
 	{

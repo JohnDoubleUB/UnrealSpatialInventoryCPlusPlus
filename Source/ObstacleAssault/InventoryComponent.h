@@ -34,7 +34,7 @@ public:
 
 	void RemoveItem(UPickupObject* pickupObject);
 
-	void AddItemAtInventoryGridIndexes(UPickupObject* pickupObject, TArray<int>* validatedIndexPositions);
+	void AddItemAtInventoryGridIndexes(UPickupObject* pickupObject, TArray<int> validatedIndexPositions);
 
 	TMap<UPickupObject*, FIntPoint> GetAllItems();
 

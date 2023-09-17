@@ -33,6 +33,7 @@ void UInventoryGridWidget::InitializeWidget(UInventoryComponent* inventoryCompon
 	Refresh();
 
 	//Bind Refresh to on Inventory changed
+	InventoryComponent->OnInventoryChangeDelegate.AddUObject(this, &UInventoryGridWidget::Refresh);
 }
 
 void UInventoryGridWidget::CreateLineSegments()
@@ -83,7 +84,6 @@ void UInventoryGridWidget::Refresh()
 
 	TMap<UPickupObject*, FIntPoint> allItems = InventoryComponent->GetAllItems();
 
-
 	for (auto& Elem : allItems)
 	{
 		UInventoryItemWidget* newWidget = CreateWidget<UInventoryItemWidget>(this, ItemWidgetClass);
@@ -106,12 +106,32 @@ void UInventoryGridWidget::Refresh()
 
 void UInventoryGridWidget::OnItemRemovedEvent(UPickupObject* PickupObject)
 {
-
+	InventoryComponent->RemoveItem(PickupObject);
 }
 
 bool UInventoryGridWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
-	//InOperation->Payload
+	//Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation); //We don't want to call this other event it is being handled!
+
+	UPickupObject* pickupObjectPayload = Cast<UPickupObject>(InOperation->Payload);
+
+	TArray<int> fullyValidatedIndexes;
+	TArray<int>* fullyValidatedIndexesPtr = &fullyValidatedIndexes;
+
+	if (pickupObjectPayload != nullptr)
+	{
+		FIntPoint* pickupDimensions = pickupObjectPayload->GetDimensions();
+		//TODO: Continue this function, look at BP_InventoryGrid_Widget2 On Drop for implementation details
+		//DragItemTopLeftTile(DragMousePosition, pickupDimensions)
+		if (InventoryComponent->TryValidateGridAvailablility(0, pickupDimensions, fullyValidatedIndexesPtr))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Hello, Unreal! This is a warning message. Yeeeee"));
+
+
+
+			return true;
+		}
+	}
 
 	return false;
 }
@@ -128,4 +148,26 @@ int32 UInventoryGridWidget::NativePaint(const FPaintArgs& Args, const FGeometry&
 	}
 
 	return int32();
+}
+
+bool UInventoryGridWidget::NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+	DragMousePosition = InGeometry.AbsoluteToLocal(InDragDropEvent.GetScreenSpacePosition());
+	return true;
+}
+
+FIntPoint UInventoryGridWidget::DragItemTopLeftTile(FVector2D const dragMousePosition, FIntPoint* itemDimensions)
+{
+	float tileHalfExtents = *TileSize * 0.5f;
+	float tileSize = *TileSize;
+
+	bool right = FMath::Fmod(dragMousePosition.X, tileSize) > tileHalfExtents;
+	bool down = FMath::Fmod(dragMousePosition.Y, tileSize) > tileHalfExtents;
+
+	FIntPoint topLeftTilePos = FIntPoint(
+		(dragMousePosition.X / tileSize) - (FMath::Max(right ? itemDimensions->X - 1 : itemDimensions->X, 0) / 2),
+		(dragMousePosition.Y / tileSize) - (FMath::Max(down ? itemDimensions->Y - 1 : itemDimensions->Y, 0) / 2)
+	);
+
+	return topLeftTilePos;
 }
