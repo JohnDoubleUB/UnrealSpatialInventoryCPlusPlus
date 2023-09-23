@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Slate/SlateBrushAsset.h"
 #include "Components/CanvasPanelSlot.h"
 #include "InventoryComponent.h"
 #include "ItemSpawner.h"
@@ -28,6 +29,16 @@ public:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UCanvasPanel* GridCanvasPanel;
 
+
+	UPROPERTY(EditAnywhere, Category = "Appearance")
+	FLinearColor DroppingAllowedColor;
+
+	UPROPERTY(EditAnywhere, Category = "Appearance")
+	FLinearColor DroppingDisallowedColor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Appearance")
+	USlateBrushAsset* DragAndDropBackgroundBrush;
+
 private:
 	UInventoryComponent* InventoryComponent;
 	UCanvasPanelSlot* CanvasPanelSlot;
@@ -41,12 +52,16 @@ private:
 
 	FVector2D DragMousePosition;
 
-	FIntPoint DragItemTopLeftTile(FVector2D const dragMousePosition, FIntPoint* itemDimensions);
+	FIntPoint DragItemTopLeftTile(const FVector2D dragMousePosition, FIntPoint* itemDimensions) const;
 	//void GetObjectFromPayload
+
+	UPickupObject* CurrentlyDraggedObject;
 
 protected:
 	bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	int32 NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const override;
 	bool NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	//void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation) override;
+	void NativeOnDragEnter(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+	void NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 };

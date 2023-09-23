@@ -15,8 +15,6 @@ void UInventoryGridWidget::InitializeWidget(UInventoryComponent* inventoryCompon
 	
 
 	//Get the canvas panel slot:
-	//GridBorder->GetSlot
-	//UPanelSlot* panelSlot = GridBorder->Slot;
 	CanvasPanelSlot = Cast<UCanvasPanelSlot>(GridBorder->Slot); //Hopefully this should work?
 	
 	if (CanvasPanelSlot == nullptr) 
@@ -114,6 +112,9 @@ bool UInventoryGridWidget::NativeOnDrop(const FGeometry& InGeometry, const FDrag
 {
 	//Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation); //We don't want to call this other event it is being handled!
 
+	UE_LOG(LogTemp, Warning, TEXT("Drag End"));
+	CurrentlyDraggedObject = nullptr;
+
 	UPickupObject* pickupObjectPayload = Cast<UPickupObject>(InOperation->Payload);
 
 	TArray<int> fullyValidatedIndexes;
@@ -142,6 +143,7 @@ bool UInventoryGridWidget::NativeOnDrop(const FGeometry& InGeometry, const FDrag
 	return false;
 }
 
+//NOTE: Const functions can only call other const functions on the same object, because const functions cannot alter the object they are part of in any way
 int32 UInventoryGridWidget::NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
 {
 	FVector2D localTopLeft = GridBorder->GetCachedGeometry().GetLocalPositionAtCoordinates(FVector2D(0.0f, 0.0f)); //Get top left
@@ -156,6 +158,23 @@ int32 UInventoryGridWidget::NativePaint(const FPaintArgs& Args, const FGeometry&
 	//TODO: Add in the paint code for the drag and drop color display
 	//Almost done!
 
+	if (CurrentlyDraggedObject != nullptr) 
+	{
+		FIntPoint topLeftTile = DragItemTopLeftTile(DragMousePosition, CurrentlyDraggedObject->GetDimensions());
+		bool goodPosition = InventoryComponent->IsRoomAvailable(topLeftTile, CurrentlyDraggedObject->GetDimensions());
+
+		float currentTileSize = *TileSize;
+		//Idk how to draw box
+		UWidgetBlueprintLibrary::DrawBox(
+			paintContext,
+			FVector2D(topLeftTile) * currentTileSize,
+			FVector2D(*CurrentlyDraggedObject->GetDimensions()) * currentTileSize,
+			DragAndDropBackgroundBrush,
+			goodPosition ? DroppingAllowedColor : DroppingDisallowedColor
+		);
+
+	}
+
 	return int32();
 }
 
@@ -165,7 +184,20 @@ bool UInventoryGridWidget::NativeOnDragOver(const FGeometry& InGeometry, const F
 	return true;
 }
 
-FIntPoint UInventoryGridWidget::DragItemTopLeftTile(FVector2D const dragMousePosition, FIntPoint* itemDimensions)
+void UInventoryGridWidget::NativeOnDragEnter(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Drag enter"));
+	CurrentlyDraggedObject = Cast<UPickupObject>(InOperation->Payload);
+
+}
+
+void UInventoryGridWidget::NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Drag End"));
+	CurrentlyDraggedObject = nullptr;
+}
+
+FIntPoint UInventoryGridWidget::DragItemTopLeftTile(const FVector2D dragMousePosition, FIntPoint* itemDimensions) const
 {
 	float tileHalfExtents = *TileSize * 0.5f;
 	float tileSize = *TileSize;

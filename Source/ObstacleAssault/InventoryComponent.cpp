@@ -78,10 +78,12 @@ bool UInventoryComponent::TryAddItem(UPickupObject* pickupObject)
 	return false;
 }
 
-bool UInventoryComponent::IsRoomAvailable(int TopLeftIndex, FIntPoint* ItemDimensions, TArray<int>*& validatedIndexes)
+bool UInventoryComponent::IsRoomAvailable(FIntPoint TopLeftIndex, FIntPoint* ItemDimensions)
 {
 	//validatedIndexes->Empty(); //Clear array incase it has anything in it
-	return TryValidateGridAvailablility(TopLeftIndex, ItemDimensions, validatedIndexes);
+	TArray<int> fullyValidatedIndexes;
+	TArray<int>* fullyValidatedIndexesPtr = &fullyValidatedIndexes;
+	return TryValidateGridAvailablility(TopLeftIndex, ItemDimensions, fullyValidatedIndexesPtr);
 }
 
 bool UInventoryComponent::TryValidateGridAvailablility(int TopLeftIndex, FIntPoint* ItemDimensions, TArray<int>*& validatedIndexes)

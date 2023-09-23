@@ -28,7 +28,7 @@ public:
 
 	bool TryAddItem(UPickupObject* pickupObject);
 
-	bool IsRoomAvailable(int TopLeftIndex, FIntPoint* ItemDimensions, TArray<int>*& validatedIndexes); //Don't know if this is needed anymore
+	bool IsRoomAvailable(FIntPoint TopLeftIndex, FIntPoint* ItemDimensions); //Don't know if this is needed anymore
 
 	bool TryValidateGridAvailablility(int topLeftIndex, FIntPoint* ItemDimensions, TArray<int>*& validatedIndexes);
 	bool TryValidateGridAvailablility(FIntPoint TileIndex, FIntPoint* ItemDimensions, TArray<int>*& validatedIndexes);
