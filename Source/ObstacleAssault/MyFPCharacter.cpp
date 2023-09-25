@@ -276,6 +276,14 @@ void AMyFPCharacter::ToggleInventory()
 	PlayerController->SetShowMouseCursor(bIsInInventory);
 }
 
+void AMyFPCharacter::RotateInventoryObject()
+{
+	if (!bIsInInventory) return;
+	if (InventoryWidget == nullptr) return;
+	
+	InventoryWidget->RotateDraggedObject();
+}
+
 void AMyFPCharacter::Sprint(const bool& sprint)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Perform sprint: %s"), (sprint ? "True" : "False"));

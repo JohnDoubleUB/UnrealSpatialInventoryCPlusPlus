@@ -39,6 +39,8 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 		IsDirty = false;
 		OnInventoryChangeDelegate.Broadcast(); //Broadcast is used for multideligate
 	}
+
+
 	// ...
 }
 
@@ -61,19 +63,29 @@ bool UInventoryComponent::TryAddItem(UPickupObject* pickupObject)
 
 		if (TryValidateGridAvailablility(i, Dimensions, fullyValidatedIndexesPtr) && fullyValidatedIndexesPtr != nullptr) //Check if this position is available and item is valid (it should be)
 		{
-			//Add item, this is a valid position!
-	/*		for (int x = 0; x < fullyValidatedIndexes->Num(); x++)
-			{
-				InventoryGrid[x] = pickupObject;
-			}*/
-
 			AddItemAtInventoryGridIndexes(pickupObject, fullyValidatedIndexes);
-
 			return true;
 		}
 	}
 
 	//TODO: Add try rotate object here
+	//Make sure the validated indexes are empty
+	fullyValidatedIndexes.Empty();
+
+	FIntPoint DimensionsRotated = FIntPoint(Dimensions->Y, Dimensions->X);
+
+	for (int i = 0; i < InventoryGrid.Num(); ++i)
+	{
+		if (TryValidateGridAvailablility(i, &DimensionsRotated, fullyValidatedIndexesPtr) && fullyValidatedIndexesPtr != nullptr) //Check if this position is available and item is valid (it should be)
+		{
+			pickupObject->Rotate(); //Rotate the object to fit
+
+			AddItemAtInventoryGridIndexes(pickupObject, fullyValidatedIndexes);
+			return true;
+		}
+	}
+
+
 
 	return false;
 }
@@ -94,12 +106,15 @@ bool UInventoryComponent::TryValidateGridAvailablility(int TopLeftIndex, FIntPoi
 
 bool UInventoryComponent::TryValidateGridAvailablility(FIntPoint TileIndex, FIntPoint* ItemDimensions, TArray<int>*& validatedIndexes)
 {
+	//If starting tile is negative, then this is definitely not a valid index
+	if (TileIndex.X < 0 || TileIndex.Y < 0) return false;
+
 	//Furthest X and Y positions from top left most index
 	int lastIndexX = TileIndex.X + ItemDimensions->X;
 	int lastIndexY = TileIndex.Y + ItemDimensions->Y;
 
 	//If it would overflow rows/columns return that this position is invalid
-	if (lastIndexX >= Columns || lastIndexY >= Rows) return false;
+	if (lastIndexX > Columns || lastIndexY > Rows) return false;
 
 
 	for (int x = TileIndex.X; x < lastIndexX; ++x) //get x

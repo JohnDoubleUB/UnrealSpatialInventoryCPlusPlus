@@ -28,7 +28,6 @@ void UInventoryGridWidget::InitializeWidget(UInventoryComponent* inventoryCompon
 
 	CreateLineSegments();
 
-	//TODO: Continue implementing this method along with other things
 	Refresh();
 
 	//Bind Refresh to on Inventory changed
@@ -103,6 +102,12 @@ void UInventoryGridWidget::Refresh()
 
 }
 
+void UInventoryGridWidget::RotateDraggedObject()
+{
+	if (CurrentlyDraggedObject == nullptr) return;
+	CurrentlyDraggedObject->Rotate();
+}
+
 void UInventoryGridWidget::OnItemRemovedEvent(UPickupObject* PickupObject)
 {
 	InventoryComponent->RemoveItem(PickupObject);
@@ -113,6 +118,7 @@ bool UInventoryGridWidget::NativeOnDrop(const FGeometry& InGeometry, const FDrag
 	//Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation); //We don't want to call this other event it is being handled!
 
 	UE_LOG(LogTemp, Warning, TEXT("Drag End"));
+	bDragInArea = false;
 	CurrentlyDraggedObject = nullptr;
 
 	UPickupObject* pickupObjectPayload = Cast<UPickupObject>(InOperation->Payload);
@@ -155,16 +161,15 @@ int32 UInventoryGridWidget::NativePaint(const FPaintArgs& Args, const FGeometry&
 		UWidgetBlueprintLibrary::DrawLine(paintContext, Line.Start + localTopLeft, Line.End + localTopLeft, FLinearColor(0.5f, 0.5f, 0.5f, 0.5f));
 	}
 
-	//TODO: Add in the paint code for the drag and drop color display
-	//Almost done!
-
 	if (CurrentlyDraggedObject != nullptr) 
 	{
 		FIntPoint topLeftTile = DragItemTopLeftTile(DragMousePosition, CurrentlyDraggedObject->GetDimensions());
+		UE_LOG(LogTemp, Warning, TEXT("MyPoint: X=%d, Y=%d"), topLeftTile.X, topLeftTile.Y);
+
 		bool goodPosition = InventoryComponent->IsRoomAvailable(topLeftTile, CurrentlyDraggedObject->GetDimensions());
 
 		float currentTileSize = *TileSize;
-		//Idk how to draw box
+
 		UWidgetBlueprintLibrary::DrawBox(
 			paintContext,
 			FVector2D(topLeftTile) * currentTileSize,
@@ -194,7 +199,8 @@ void UInventoryGridWidget::NativeOnDragEnter(const FGeometry& InGeometry, const 
 void UInventoryGridWidget::NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Drag End"));
-	CurrentlyDraggedObject = nullptr;
+	bDragInArea = false;
+	//CurrentlyDraggedObject = nullptr;
 }
 
 FIntPoint UInventoryGridWidget::DragItemTopLeftTile(const FVector2D dragMousePosition, FIntPoint* itemDimensions) const

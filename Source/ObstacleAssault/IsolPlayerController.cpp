@@ -26,6 +26,7 @@ void AIsolPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Crouch", IE_Pressed, this, &AIsolPlayerController::Crouch);
 	InputComponent->BindAction("Jump", IE_Pressed, this, &AIsolPlayerController::Jump);
 	InputComponent->BindAction("ToggleInventory", IE_Pressed, this, &AIsolPlayerController::ToggleInventory);
+	InputComponent->BindAction("RotateInventoryObject", IE_Pressed, this, &AIsolPlayerController::RotateInventoryObject);
 
 	FInputActionBinding SprintPressedAB("Sprint", IE_Pressed);
 	SprintPressedAB.ActionDelegate.GetDelegateForManualSet().BindLambda([this]()
@@ -128,6 +129,14 @@ void AIsolPlayerController::ToggleInventory()
 	if (possesedPawn) 
 	{
 		possesedPawn->ToggleInventory();
+	}
+}
+
+void AIsolPlayerController::RotateInventoryObject()
+{
+	if (possesedPawn)
+	{
+		possesedPawn->RotateInventoryObject();
 	}
 }
 

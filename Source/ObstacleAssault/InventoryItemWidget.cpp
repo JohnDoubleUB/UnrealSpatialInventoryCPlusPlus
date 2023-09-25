@@ -12,12 +12,40 @@ void UInventoryItemWidget::InitializeWidget(UPickupObject* NewPickupObject, floa
 	PickupObject = NewPickupObject;
 	TileSize = NewTileSize;
 
-	if (NewPickupObject == nullptr)
-	{
-		return;
-	}
+	UpdatePickupDimensions();
 
-	FIntPoint* objectDimensions = NewPickupObject->GetDimensions();
+	if (PickupObject != nullptr) 
+	{
+		PickupObject->OnRotationChange.BindUObject(this, &UInventoryItemWidget::UpdatePickupDimensions);
+	}
+	//if (NewPickupObject == nullptr)
+	//{
+	//	return;
+	//}
+
+	//FIntPoint* objectDimensions = NewPickupObject->GetDimensions();
+	//Size = FVector2D(objectDimensions->X * TileSize, objectDimensions->Y * TileSize);
+
+	//BackgroundSizeBox->SetWidthOverride(Size.X);
+	//BackgroundSizeBox->SetHeightOverride(Size.Y);
+
+	//ItemImageCanvasPanelSlot = Cast<UCanvasPanelSlot>(ItemImage->Slot);
+
+	//if (ItemImageCanvasPanelSlot == nullptr)
+	//{
+	//	return;
+	//}
+
+	//ItemImageCanvasPanelSlot->SetSize(Size);
+}
+
+
+
+void UInventoryItemWidget::UpdatePickupDimensions()
+{
+	if (PickupObject == nullptr) return;
+
+	FIntPoint* objectDimensions = PickupObject->GetDimensions();
 	Size = FVector2D(objectDimensions->X * TileSize, objectDimensions->Y * TileSize);
 
 	BackgroundSizeBox->SetWidthOverride(Size.X);

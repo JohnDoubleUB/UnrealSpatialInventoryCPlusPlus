@@ -34,6 +34,7 @@ public:
 	void Jump();
 	void Interact(const bool& pressed); //pressed or released
 	void ToggleInventory();
+	void RotateInventoryObject();
 
 	void Sprint(const bool& sprint);
 };

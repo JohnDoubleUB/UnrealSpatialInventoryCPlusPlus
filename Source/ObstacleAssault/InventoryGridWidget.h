@@ -39,6 +39,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Appearance")
 	USlateBrushAsset* DragAndDropBackgroundBrush;
 
+	void RotateDraggedObject();
+
 private:
 	UInventoryComponent* InventoryComponent;
 	UCanvasPanelSlot* CanvasPanelSlot;
@@ -56,6 +58,7 @@ private:
 	//void GetObjectFromPayload
 
 	UPickupObject* CurrentlyDraggedObject;
+	bool bDragInArea;
 
 protected:
 	bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;

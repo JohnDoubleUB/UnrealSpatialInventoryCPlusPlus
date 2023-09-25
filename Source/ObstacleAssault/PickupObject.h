@@ -15,30 +15,33 @@ class OBSTACLEASSAULT_API UPickupObject : public UObject
 	GENERATED_BODY()
 
 public:
-	FIntPoint* GetDimensions() { return &Dimensions; }
+	FIntPoint* GetDimensions();
 	void SetDimensions(FIntPoint NewDimensions) { Dimensions = NewDimensions; }
 	bool GetIsRotated() { return bIsRotated; }
 	UMaterialInterface* GetIconMaterialInterface() { return IconMaterialInterface; }
 	UMaterialInterface* GetIconRotatedMaterialInterface() { return IconRotatedMaterialInterface; }
 	UMaterialInterface* GetIcon();
 	TSubclassOf<class ABasicPickup> GetItemSubclass() { return ItemClass; }
-
 	UPickupObject* SetParameters(FIntPoint NewDimensions, UMaterialInterface* NewIconMaterialInterface, UMaterialInterface* NewIconRotatedMaterialInterface, TSubclassOf<class ABasicPickup> NewItemClass);
+	void Rotate();
+
+	DECLARE_DELEGATE(FOnRotationChange)
+	FOnRotationChange OnRotationChange;
 
 private:
 	UPROPERTY(EditAnywhere)
-		FIntPoint Dimensions = FIntPoint(10, 10);
+	FIntPoint Dimensions = FIntPoint(10, 10);
 
 	UPROPERTY(EditAnywhere)
-		bool bIsRotated;
+	bool bIsRotated;
 
 	UPROPERTY(EditAnywhere)
-		UMaterialInterface* IconMaterialInterface;
+	UMaterialInterface* IconMaterialInterface;
 
 	UPROPERTY(EditAnywhere)
-		UMaterialInterface* IconRotatedMaterialInterface;
+	UMaterialInterface* IconRotatedMaterialInterface;
 
 	UPROPERTY(EditAnywhere)
-		TSubclassOf<class ABasicPickup> ItemClass;
+	TSubclassOf<class ABasicPickup> ItemClass;
 
 };

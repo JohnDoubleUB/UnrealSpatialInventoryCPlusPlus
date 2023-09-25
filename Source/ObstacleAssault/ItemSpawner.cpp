@@ -35,7 +35,18 @@ void UItemSpawner::SpawnItemFromActor(UWorld* world, UPickupObject* pickupObject
 		}
 	}
 
-	FActorSpawnParameters spawnParams;
+	world->SpawnActor<ABasicPickup>(itemSubclass, spawnLocation, FRotator(), FActorSpawnParameters());
+}
 
-	world->SpawnActor<ABasicPickup>(itemSubclass, spawnLocation, FRotator(), spawnParams);
+//TODO: use this to raycast mouse position of drop
+//https://forums.unrealengine.com/t/how-to-do-real-raycasting-using-the-mouse/377229/4
+void UItemSpawner::SpawnItemAtPosition(UWorld* world, UPickupObject* pickupObject, FVector position, FRotator rotation = FRotator())
+{
+	if (pickupObject == nullptr) return;
+
+	TSubclassOf<ABasicPickup> itemSubclass = pickupObject->GetItemSubclass();
+
+	if (itemSubclass == nullptr) return;
+
+	world->SpawnActor<ABasicPickup>(itemSubclass, position, rotation, FActorSpawnParameters());
 }

@@ -14,6 +14,12 @@ void UInventoryWidget::InitializeWidget(UInventoryComponent* inventoryComponent,
 	OnWidgetInitialized(inventoryComponent, *tileSize);
 }
 
+void UInventoryWidget::RotateDraggedObject()
+{
+	if (InventoryGridWidget == nullptr) return;
+	InventoryGridWidget->RotateDraggedObject();
+}
+
 bool UInventoryWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	UPickupObject* pickupObject = Cast<UPickupObject>(InOperation->Payload); //Get the pickup

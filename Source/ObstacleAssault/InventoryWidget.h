@@ -22,6 +22,8 @@ public:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UInventoryGridWidget* InventoryGridWidget;
 
+	void RotateDraggedObject();
+
 private: 
 	UInventoryComponent* InventoryComponent;
 	float* TileSize;

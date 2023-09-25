@@ -82,6 +82,7 @@ public:
 	void Jump();
 	void Interact(const bool& pressed);
 	void ToggleInventory();
+	void RotateInventoryObject();
 
 	void Sprint(const bool& sprint);
 

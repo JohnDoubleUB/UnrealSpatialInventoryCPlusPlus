@@ -38,6 +38,8 @@ private:
 
 	class UMaterialInterface* CurrentIcon;
 
+	void UpdatePickupDimensions();
+
 protected:
 	void NativeOnMouseEnter(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	void NativeOnMouseLeave(const FPointerEvent& InMouseEvent) override;
